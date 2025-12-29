@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<!--
+  Template: BIO v1.0
+  Author: Haruki Tominaga
+  License: https://amix-design.com/tominaga/eyan-theme/license 
+  © 2025 EYAN / トミナガハルキ
+-->
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow">
+    
+    <title>Template - BIO</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Zen+Old+Mincho:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* =========================================
+           カラー設定
+           ★ここの色コードを変更すると、サイト全体の配色が一括で変わります
+           ========================================= */
+        :root {
+            --text: #2c3e50;  /* メインの文字色 */
+            --green: #4a6c4c; /* アクセントカラー（ロゴや強調部分） */
+            --beige: #f4f1ea; /* 背景色（スクロール後など） */
+        }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Tenor Sans', 'Zen Old Mincho', serif; /* ★フォント指定 */
+            color: var(--text);
+            background: #fff; /* 初期状態は白 */
+            transition: background 1s ease; /* 背景色の変化をなめらかに */
+        }
+        
+        /* ▼▼▼ 追加：スクロール後の背景色設定 ▼▼▼ */
+        body.scrolled {
+            background: var(--beige);
+        }
+
+        /* ヒーローエリア */
+        .hero {
+            height: 90vh; position: relative; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .hero-img {
+            position: absolute; width: 100%; height: 120%; object-fit: cover;
+            top: 0; left: 0; z-index: -1; filter: brightness(0.9);
+            will-change: transform;
+        }
+        
+        /* 波のアニメーションCSS */
+        .waves-container {
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 15vh;
+            margin-bottom: -7px; z-index: 1;
+            min-height: 100px; max-height: 150px;
+        }
+        .waves {
+            position: absolute; width: 100%; height: 100%;
+            left: 0; bottom: 0;
+        }
+        
+        .parallax > use {
+            animation: move-forever 25s cubic-bezier(.55,.5,.45,.5) infinite;
+            /* ▼▼▼ 追加：波の色変化もなめらかにする設定 ▼▼▼ */
+            transition: fill 1s ease; 
+        }
+        
+        .parallax > use:nth-child(1) {
+            animation-delay: -2s; animation-duration: 7s;
+            fill: rgba(255, 255, 255, 0.7);
+        }
+        .parallax > use:nth-child(2) {
+            animation-delay: -3s; animation-duration: 10s;
+            fill: rgba(255, 255, 255, 0.5);
+        }
+        .parallax > use:nth-child(3) {
+            animation-delay: -4s; animation-duration: 13s;
+            fill: rgba(255, 255, 255, 0.3);
+        }
+        .parallax > use:nth-child(4) {
+            animation-delay: -5s; animation-duration: 20s;
+            fill: #fff; /* 初期状態は白 */
+        }
+
+        /* ▼▼▼ 追加：スクロール時に一番手前の波だけベージュにする設定 ▼▼▼ */
+        body.scrolled .parallax > use:nth-child(4) {
+            fill: var(--beige);
+        }
+
+        @keyframes move-forever {
+            0% { transform: translate3d(-90px,0,0); }
+            100% { transform: translate3d(85px,0,0); }
+        }
+
+        .hero-overlay {
+            background: rgba(255,255,255,0.85);
+            padding: 4rem;
+            text-align: center; border-radius: 50% 50% 0 0 / 20% 20% 0 0;
+            position: absolute; bottom: 0; width: 60%;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.05);
+            z-index: 10;
+            backdrop-filter: blur(2px);
+        }
+        .hero-title { font-size: 3rem; margin: 0 0 1rem; color: var(--green); }
+        .hero-lead { font-size: 1.1rem; line-height: 2; }
+
+        /* コンテンツ */
+        .container { max-width: 1000px; margin: 0 auto; padding: 8rem 2rem; }
+        
+        .mission { text-align: center; padding: 4rem 0; }
+        .mission-h2 { font-size: 2rem; color: var(--green); margin-bottom: 2rem; }
+        .mission-p { font-size: 1.2rem; line-height: 2.2; max-width: 700px; margin: 0 auto; }
+
+        /* Projects / Gallery */
+        .projects { 
+            margin-top: 6rem; 
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .proj-item { 
+            opacity: 0; transform: translateY(30px); transition: 1s; 
+            cursor: pointer; position: relative;
+        }
+        .proj-item.visible { opacity: 1; transform: translateY(0); }
+
+        .p-img-box { 
+            width: 100%; aspect-ratio: 4/3; 
+            overflow: hidden; border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .p-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .proj-item:hover .p-img { transform: scale(1.1); }
+
+        .p-text-preview {
+            margin-top: 1rem; text-align: center;
+        }
+        .p-head { font-size: 1.2rem; margin: 0; color: var(--green); }
+        
+        /* モーダル */
+        .modal {
+            display: none; position: fixed; z-index: 1000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        .modal.open { display: flex; opacity: 1; }
+        .modal-content {
+            background: #fff; width: 90%; max-width: 800px; max-height: 90vh;
+            border-radius: 8px; overflow: hidden; display: flex; flex-direction: column;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .modal-close {
+            position: absolute; top: 1rem; right: 1rem; font-size: 2rem; cursor: pointer;
+            color: #333; z-index: 10; background: rgba(255,255,255,0.8);
+            width: 40px; height: 40px; border-radius: 50%; text-align: center; line-height: 40px;
+        }
+        .modal-img { width: 100%; height: 50vh; object-fit: cover; }
+        .modal-body { padding: 2rem; overflow-y: auto; }
+        .modal-title { color: var(--green); font-size: 1.5rem; margin-top: 0; }
+        .modal-desc { line-height: 1.8; color: #555; }
+
+        /* データ可視化 */
+        .esg-data {
+            display: flex; justify-content: space-around; text-align: center; margin-top: 6rem;
+        }
+        .circle-stat {
+            width: 180px; height: 180px; border: 2px solid var(--green); border-radius: 50%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .cs-num { font-size: 2.5rem; color: var(--green); }
+        .cs-label { font-size: 0.8rem; margin-top: 0.5rem; }
+
+        /* 会社概要エリア */
+        .company-section {
+            background-color: var(--beige);
+            padding: 3rem 2rem; margin-top: 4rem;
+        }
+        .company-inner {
+            max-width: 800px; margin: 0 auto;
+        }
+        .company-title {
+            text-align: center; font-size: 2rem; color: var(--green); margin-bottom: 3rem;
+        }
+        .company-table {
+            width: 100%; border-collapse: collapse;
+        }
+        .company-table th, .company-table td {
+            padding: 1.5rem; border-bottom: 1px solid #ddd; text-align: left;
+        }
+        .company-table th { width: 30%; color: var(--green); font-weight: 600; }
+
+        footer { background: var(--green); color: #fff; padding: 5rem 0; text-align: center; }
+        
+        .footer-msg { font-size: 2rem; margin-bottom: 2rem; }
+
+        @media (max-width: 768px) {
+            .hero-overlay { width: 90%; padding: 2rem; }
+            .modal-content { flex-direction: column; height: auto; max-height: 90vh; }
+            .modal-img { height: 30vh; }
+            .projects { grid-template-columns: 1fr; }
+            .esg-data { flex-direction: column; gap: 2rem; align-items: center; }
+            .company-table th, .company-table td { display: block; width: 100%; padding: 0.5rem 0; }
+            .company-table th { margin-top: 1rem; border-bottom: none; }
+            .company-section { padding: 3rem 1rem; }
+            .mission-p { font-size: 1rem; line-height: 1.8; }
+            .footer-msg { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <img src="image/main.jpg" class="hero-img" id="hero-bg" onerror="this.style.backgroundColor='#ccc'">
+        
+        <div class="waves-container">
+            <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+            viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+                <defs>
+                    <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+                </defs>
+                <g class="parallax">
+                    <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(255,255,255,0.7" />
+                    <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(255,255,255,0.5)" />
+                    <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(255,255,255,0.3)" />
+                    <use xlink:href="#gentle-wave" x="48" y="7" fill="#fff" />
+                </g>
+            </svg>
+        </div>
+
+        <div class="hero-overlay">
+            <h1 id="brand-name" class="hero-title"></h1>
+            <p id="hero-msg" class="hero-lead"></p>
+        </div>
+    </div>
+
+    <div class="container">
+        <section class="mission">
+            <h2 class="mission-h2">Sustainability Vision</h2>
+            <p id="mission-text" class="mission-p"></p>
+            
+            <div id="esg-area" class="esg-data">
+            </div>
+        </section>
+
+        <section id="projects-area" class="projects">
+        </section>
+    </div>
+
+    <section class="company-section">
+        <div class="company-inner">
+            <h2 class="company-title">Company Overview</h2>
+            <table class="company-table">
+                <tr>
+                    <th>Company Name</th>
+                    <td id="co-name"></td> </tr>
+                <tr>
+                    <th>Headquarters</th>
+                    <td>〒100-0004 東京都千代田区大手町 0-1-2</td>
+                </tr>
+                <tr>
+                    <th>Established</th>
+                    <td>2010年4月1日</td>
+                </tr>
+                <tr>
+                    <th>Representative</th>
+                    <td>代表取締役 山田 太郎</td>
+                </tr>
+                <tr>
+                    <th>Business</th>
+                    <td>環境コンサルティング、再生可能エネルギー事業</td>
+                </tr>
+            </table>
+        </div>
+    </section>
+
+    <footer>
+        <h2 class="footer-msg">For a Better Tomorrow.</h2>
+        <p>&copy; <span id="year"></span> <span id="footer-brand"></span></p>
+    </footer>
+
+    <div id="project-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <img src="" id="modal-img" class="modal-img">
+            <div class="modal-body">
+                <h3 id="modal-title" class="modal-title"></h3>
+                <p id="modal-desc" class="modal-desc"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* =========================================
+           コンテンツ設定 (Config)
+           ★以下の内容を書き換えるだけで、サイトの文字情報が更新されます
+           ========================================= */
+        const config = {
+            // 1. ブランド名・会社名
+            name: "BIO-SPHERE CORP.",
+            
+            // 2. トップページのメインメッセージ（<br>で改行）
+            heroMsg: "自然の叡智を、明日の暮らしへ。<br>私たちは地球と共鳴するテクノロジーを創造します。",
+            
+            // 3. ミッションステートメント（<br>で改行）
+            mission: "2050年までにカーボンニュートラルを実現。<br>それは目標ではなく、私たちの約束です。<br>全て事業活動において、環境負荷低減と<br>社会への貢献を最優先事項としています。",
+            
+            // 4. 数字データ（円グラフ風の表示箇所）
+            // num: 数字, label: 下のラベル文字
+            stats: [
+                { num: "100%", label: "RENEWABLE ENERGY" },
+                { num: "-40%", label: "CO2 EMISSION" },
+                { num: "0", label: "WASTE TO LANDFILL" }
+            ],
+            
+            // 5. プロジェクト一覧（画像をクリックした時の詳細）
+            // 画像ファイルは image/image1.jpg, image/image2.jpg... のように連番で用意してください
+            projectDescriptions: {
+                1: { title: "Forest Regeneration", desc: "持続可能な森林管理と、生態系の回復を目指す植林プロジェクト。" },
+                2: { title: "Clean Water Access", desc: "途上国における安全な水資源の確保と、衛生環境の改善支援。" },
+                3: { title: "Ethical Sourcing", desc: "サプライチェーン全体での人権尊重と、公正な取引の徹底。" },
+                4: { title: "Green Energy Shift", desc: "事業運営における再生可能エネルギー比率の向上と、脱炭素化の推進。" },
+                5: { title: "Circular Economy", desc: "製品ライフサイクル全体での廃棄物削減と、資源循環システムの構築。" },
+                6: { title: "Community Bond", desc: "地域社会との対話を通じた、教育支援と持続可能なまちづくりへの貢献。" },
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Basic Info
+            document.getElementById('brand-name').textContent = config.name;
+            document.getElementById('footer-brand').textContent = config.name;
+            document.getElementById('co-name').textContent = config.name;
+            document.getElementById('hero-msg').innerHTML = config.heroMsg;
+            document.getElementById('mission-text').innerHTML = config.mission;
+            document.getElementById('year').textContent = new Date().getFullYear();
+
+            // Stats
+            const esg = document.getElementById('esg-area');
+            config.stats.forEach(s => {
+                esg.innerHTML += `
+                    <div class="circle-stat">
+                        <span class="cs-num">${s.num}</span>
+                        <span class="cs-label">${s.label}</span>
+                    </div>
+                `;
+            });
+
+            // Scroll Animations & Parallax Setup
+            const body = document.body;
+            const heroBg = document.getElementById('hero-bg');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('visible');
+                });
+            }, { threshold: 0.1 });
+
+
+            // Projects
+            const projArea = document.getElementById('projects-area');
+            const maxImages = 18; // ★画像を読み込む最大枚数（フォルダ内に画像があれば自動表示されます）
+
+            for (let i = 1; i <= maxImages; i++) {
+                const item = document.createElement('div');
+                item.className = 'proj-item';
+                item.style.display = 'none';
+                
+                // 設定がない番号のデフォルト文言
+                const info = config.projectDescriptions[i] || { 
+                    title: `Project 0${i}`, 
+                    desc: "環境と調和する持続可能な取り組みの詳細情報。" 
+                };
+
+                item.innerHTML = `
+                    <div class="p-img-box">
+                        <img src="image/image${i}.jpg" class="p-img" alt="${info.title}">
+                    </div>
+                    <div class="p-text-preview">
+                        <h3 class="p-head">${info.title}</h3>
+                    </div>
+                `;
+
+                const img = item.querySelector('img');
+                
+                // 画像の読み込みに成功した場合のみ表示する処理
+                img.onload = function() {
+                    item.style.display = '';
+                    observer.observe(item);
+                };
+
+                img.onerror = function() {
+                    item.remove();
+                };
+
+                item.addEventListener('click', () => {
+                    openModal(`image/image${i}.jpg`, info.title, info.desc);
+                });
+
+                projArea.appendChild(item);
+            }
+
+            // Modal Logic
+            const modal = document.getElementById('project-modal');
+            const modalImg = document.getElementById('modal-img');
+            const modalTitle = document.getElementById('modal-title');
+            const modalDesc = document.getElementById('modal-desc');
+            const closeBtn = document.querySelector('.modal-close');
+
+            function openModal(src, title, desc) {
+                modalImg.src = src;
+                modalTitle.textContent = title;
+                modalDesc.innerHTML = desc;
+                modal.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeModal() {
+                modal.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+
+            closeBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+
+
+            window.addEventListener('scroll', () => {
+                const y = window.scrollY;
+                
+                // スマホ（幅768px以下）ではパララックス無効化
+                if (window.innerWidth > 768) {
+                    heroBg.style.transform = `translateY(${y * 0.4}px)`;
+                } else {
+                    heroBg.style.transform = 'none';
+                }
+
+                // ▼▼▼ 変更：クラスの付け外しで色を管理 ▼▼▼
+                if (y > 300) {
+                    body.classList.add('scrolled'); // ベージュモード
+                } else {
+                    body.classList.remove('scrolled'); // 通常（白）モード
+                }
+            });
+        });
+    </script>
+</body>
+</html>

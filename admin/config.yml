@@ -1,65 +1,35 @@
 backend:
-  name: git-gateway
-  repo: shinoefuhi/shinoefuhi-site # ご自身のリポジトリ名に合わせてください
+  name: github
+  repo: shinoefuhi/shinoefuhi-site
   branch: main
 
-media_folder: "images/uploads" # 画像が保存される場所
-public_folder: "/images/uploads"
+media_folder: "images"
+public_folder: "/images"
 
 collections:
   - name: "lives"
-    label: "LIVE情報"
-    folder: "_data/lives" # ライブデータを個別に保存する場所
+    label: "Live Information"
+    folder: "_data/lives"
     create: true
-    slug: "{{year}}-{{month}}-{{day}}-{{title}}"
+    slug: "{{date}}-{{title}}"
     fields:
-      - label: "公演日"
-        name: "date"
-        widget: "datetime"
-        format: "YYYY-MM-DD"
-        date_format: "YYYY-MM-DD"
-        time_format: false
-        
-     - label: "OPEN時間"
-        name: "open_time"
-        widget: "string"
-        hint: "例：18:30"
-        required: false
-
-      - label: "START時間"
-        name: "start_time"
-        widget: "string"
-        hint: "例：19:00"
-        required: false
-
-      - label: "チケット料金"
-        name: "price"
-        widget: "string"
-        hint: "前売 ¥3,000 / 当日 ¥3,500 (+1D)"
-        required: false
-        
-      - {label: "タイトル", name: "title", widget: "string"}
-      - {label: "会場", name: "place", widget: "string"}
-      
-      - name: "artists"
-        label: "共演"
-        widget: "string"
-        required: false
-        
-      - {label: "チケットURL", name: "ticketUrl", widget: "string", required: false}
-      - {label: "フライヤー画像", name: "flyer", widget: "image", required: false}
-  
+      - { label: "Date", name: "date", widget: "datetime", format: "YYYY-MM-DD", dateFormat: "YYYY-MM-DD", timeFormat: false }
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Place", name: "place", widget: "string", required: false }
+      - { label: "Open Time", name: "open_time", widget: "string", required: false }
+      - { label: "Start Time", name: "start_time", widget: "string", required: false }
+      - { label: "Price", name: "price", widget: "string", required: false }
+      - { label: "Artists", name: "artists", widget: "string", required: false }
+      - { label: "Ticket URL", name: "ticketUrl", widget: "string", required: false }
 
   - name: "discography"
-    label: "作品情報"
+    label: "Discography"
     folder: "_data/discography"
     create: true
     slug: "{{title}}"
     fields:
-      - {label: "タイトル", name: "title", widget: "string"}
-      - {label: "種別", name: "type", widget: "select", options: ["Digital Single", "EP", "Album"]}
-      - {label: "ジャケット画像", name: "image", widget: "image"}
-      - {label: "Apple Music URL", name: "appleMusic", widget: "string", required: false}
-      - {label: "Spotify URL", name: "spotify", widget: "string", required: false}
-      - {label: "YouTube URL", name: "youtube", widget: "string", required: false}
-      - {label: "CD詳細情報", name: "body", widget: "markdown", required: false}
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Image URL", name: "image", widget: "string" }
+      - { label: "YouTube URL", name: "youtube", widget: "string", required: false }
+      - { label: "Apple Music URL", name: "appleMusic", widget: "string", required: false }
+      - { label: "Spotify URL", name: "spotify", widget: "string", required: false }

@@ -42,3 +42,15 @@ button{
 textarea{
  height:160px;
 }
+#disc-preview{
+ border:1px solid #ddd;
+ padding:20px;
+ margin-bottom:20px;
+ text-align:center;
+}
+#disc-preview img{
+ width:200px;
+ aspect-ratio:1/1;
+ object-fit:cover;
+ margin-bottom:10px;
+}

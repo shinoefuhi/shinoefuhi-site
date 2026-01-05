@@ -1,26 +1,26 @@
 [
   {
-    "date": "2026-02-15",
-    "time": "18:00 START",
-    "title": "shinoefuhi 1st Live Event",
-    "place": "SHIBUYA O-WEST",
-    "ticketUrl": "https://eplus.jp/...",
-    "flyer": "flyer_20260215.jpg"
-  },
-  {
-    "date": "2026-03-01",
-    "time": "17:30 START",
-    "title": "Spring Rock Festival",
-    "place": "OSAKA LIVE HOUSE XYZ",
-    "ticketUrl": "mailto:info@shinoefuhi.com",
+    "date": "",
+    "time": "",
+    "title": "",
+    "place": "",
+    "ticketUrl": "",
     "flyer": ""
   },
   {
-    "date": "2025-12-25",
-    "time": "19:00 START",
-    "title": "Past Live Example",
-    "place": "SHINJUKU LOFT",
+    "date": "",
+    "time": "",
+    "title": "",
+    "place": "",
     "ticketUrl": "",
-    "flyer": "flyer_old.jpg"
+    "flyer": ""
+  },
+  {
+    "date": "",
+    "time": "",
+    "title": "",
+    "place": "",
+    "ticketUrl": "",
+    "flyer": ""
   }
 ]

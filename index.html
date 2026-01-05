@@ -14,9 +14,7 @@
             --sub-text: #7f8c8d;
         }
 
-        html {
-            scroll-behavior: smooth;
-        }
+        html { scroll-behavior: smooth; }
 
         body {
             margin: 0;
@@ -29,12 +27,9 @@
             animation: pageFadeIn 1.5s ease-out forwards;
         }
 
-        /* ページ全体のフェードイン */
-        @keyframes pageFadeIn {
-            to { opacity: 1; }
-        }
+        @keyframes pageFadeIn { to { opacity: 1; } }
 
-        /* Hero Section - パララックス効果と有機的な動き */
+        /* Hero Section */
         header {
             height: 100vh;
             position: relative;
@@ -50,18 +45,12 @@
             background: url('artist-photo.jpg') center/cover no-repeat;
             filter: brightness(0.8);
             z-index: -1;
-            /* スクロール時に背景が少し遅れて動くパララックス効果はJSで制御 */
             transform: scale(1.05);
             transition: transform 0.1s ease-out;
         }
 
-        .hero-content {
-            text-align: center;
-            color: white;
-            z-index: 1;
-        }
+        .hero-content { text-align: center; color: white; z-index: 1; }
 
-        /* エンブレムの浮遊アニメーション */
         .main-emblem {
             width: 280px;
             height: auto;
@@ -95,7 +84,7 @@
             position: sticky;
             top: 0;
             background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px); /* すりガラス効果を強化 */
+            backdrop-filter: blur(12px);
             padding: 20px;
             display: flex;
             justify-content: center;
@@ -107,141 +96,77 @@
             transition: all 0.3s ease;
         }
 
-        nav a {
-            color: var(--main-text);
-            text-decoration: none;
-            position: relative;
-            transition: color 0.3s;
-        }
-
+        nav a { color: var(--main-text); text-decoration: none; position: relative; }
         nav a::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 1px;
-            background: var(--main-text);
-            transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 1px;
+            background: var(--main-text); transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
         }
+        nav a:hover::after { width: 100%; }
 
-        nav a:hover::after {
-            width: 100%;
-        }
-
-        /* セクション共通 */
-        section {
-            padding: 120px 20px;
-            max-width: 1000px;
-            margin: auto;
-        }
-
+        /* Sections */
+        section { padding: 120px 20px; max-width: 1000px; margin: auto; }
         h2 {
-            text-align: center;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 300;
-            font-size: 2rem;
-            margin-bottom: 60px;
-            letter-spacing: 0.3rem;
-            position: relative;
-            display: inline-block;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        
-        /* スクロール連動アニメーション用のクラス */
-        .reveal {
-            opacity: 0;
-            transform: translateY(40px);
-            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1); /* 慣性のある滑らかな動き */
+            text-align: center; font-family: 'Montserrat', sans-serif; font-weight: 300;
+            font-size: 2rem; margin-bottom: 60px; letter-spacing: 0.3rem;
         }
 
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        .reveal { opacity: 0; transform: translateY(40px); transition: all 1s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
 
         /* DISCOGRAPHY */
-        .disc-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
-        }
-
+        .disc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
         .disc-item {
-            background: white;
-            padding: 20px;
-            border-radius: 4px;
-            box-shadow: 10px 10px 0px rgba(253, 253, 150, 0.4); /* 黄色を少し透明に */
+            background: white; padding: 20px; border-radius: 4px;
+            box-shadow: 10px 10px 0px rgba(253, 253, 150, 0.4);
             transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease;
         }
-
-        .disc-item:hover {
-            transform: translateY(-8px);
-            box-shadow: 15px 15px 0px rgba(173, 216, 230, 0.4); /* 青を少し透明に */
-        }
-
-        .disc-item img {
-            width: 100%;
-            height: auto;
-            display: block;
-            margin-bottom: 20px;
-            border-radius: 2px;
-        }
+        .disc-item:hover { transform: translateY(-8px); box-shadow: 15px 15px 0px rgba(173, 216, 230, 0.4); }
+        .disc-item img { width: 100%; height: auto; display: block; margin-bottom: 20px; border-radius: 2px; }
 
         /* VIDEO */
         .video-wrapper {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
-            border-radius: 4px;
-            overflow: hidden;
+            position: relative; padding-bottom: 56.25%; height: 0;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1); border-radius: 4px; overflow: hidden;
             transition: transform 0.5s ease;
         }
-        
-        .video-wrapper:hover {
-            transform: scale(1.01);
-        }
-
-        .video-wrapper iframe {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-        }
+        .video-wrapper:hover { transform: scale(1.01); }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
         /* SNS & Contact */
         .social-area {
-            text-align: center;
-            font-size: 2rem;
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-bottom: 40px;
+            text-align: center; font-size: 2rem; display: flex; justify-content: center; gap: 40px; margin-bottom: 40px;
         }
-        
-        .social-area a {
-            color: var(--main-text);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.3s;
+        .social-area a { color: var(--main-text); transition: transform 0.3s, color 0.3s; }
+        .social-area a:hover { transform: translateY(-5px); color: #70a1ff; }
+
+        /* Google Form Custom Style */
+        .form-section {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            margin-top: 40px;
+        }
+        .form-title {
+            text-align: center; font-family: 'Montserrat', sans-serif; margin-bottom: 20px; font-size: 1.2rem; letter-spacing: 0.1rem;
+        }
+        .google-form-container {
+            position: relative;
+            width: 100%;
+            height: 800px; /* フォームの長さに応じて調整してください */
+            overflow: hidden;
+        }
+        .google-form-container iframe {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;
         }
 
-        .social-area a:hover {
-            transform: translateY(-5px);
-            color: #70a1ff; /* 淡い青のアクセント */
-        }
-
-        footer {
-            text-align: center;
-            padding: 80px 20px;
-            font-size: 0.8rem;
-            color: var(--sub-text);
-            letter-spacing: 0.1rem;
-        }
+        footer { text-align: center; padding: 80px 20px; font-size: 0.8rem; color: var(--sub-text); letter-spacing: 0.1rem; }
 
         @media (max-width: 768px) {
-            h1 { font-size: 2rem; }
-            .main-emblem { width: 200px; }
-            nav { gap: 15px; font-size: 0.7rem; }
-            section { padding: 80px 20px; }
+            h1 { font-size: 2rem; } .main-emblem { width: 200px; }
+            nav { gap: 15px; font-size: 0.7rem; } section { padding: 80px 20px; }
+            .form-section { padding: 20px; }
+            .google-form-container { height: 950px; /* スマホの場合は縦長になるので高さを増やす */ }
         }
     </style>
 </head>
@@ -290,14 +215,25 @@
     </div>
 </section>
 
-<section id="contact" style="text-align: center;" class="reveal">
+<section id="contact" class="reveal">
     <h2>SNS / CONTACT</h2>
     <div class="social-area">
         <a href="https://www.youtube.com/@shinoefuhi" target="_blank"><i class="fab fa-youtube"></i></a>
         <a href="https://twitter.com/" target="_blank"><i class="fab fa-x-twitter"></i></a>
         <a href="https://www.instagram.com/" target="_blank"><i class="fab fa-instagram"></i></a>
     </div>
-    <p>info@shinoefuhi.com</p>
+    
+    <p style="text-align: center; margin-bottom: 40px;">
+        出演依頼・お問い合わせ：<br>
+        <a href="mailto:info@shinoefuhi.com" style="color: var(--main-text); text-decoration: underline;">info@shinoefuhi.com</a>
+    </p>
+
+    <div class="form-section">
+        <div class="form-title">TICKET RESERVATION</div>
+        <div class="google-form-container">
+            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfD_dummy_url_please_replace_this/viewform?embedded=true" width="640" height="800" frameborder="0" marginheight="0" marginwidth="0">読み込んでいます…</iframe>
+        </div>
+    </div>
 </section>
 
 <footer>
@@ -307,28 +243,18 @@
 </footer>
 
 <script>
-    // スクロールに合わせて要素をふわっと表示させる（有機的な動きの肝）
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('active');
-            }
+            if (entry.isIntersecting) { entry.target.classList.add('active'); }
         });
-    }, {
-        threshold: 0.15 // 画面の15%が見えたら発動
-    });
+    }, { threshold: 0.15 });
 
-    document.querySelectorAll('.reveal').forEach(element => {
-        observer.observe(element);
-    });
+    document.querySelectorAll('.reveal').forEach(element => { observer.observe(element); });
 
-    // 背景画像のパララックス効果（スクロール速度とずらす）
     window.addEventListener('scroll', () => {
         const scrolled = window.pageYOffset;
         const bg = document.getElementById('hero-bg');
-        if(bg) {
-            bg.style.transform = `translateY(${scrolled * 0.4}px) scale(1.05)`;
-        }
+        if(bg) { bg.style.transform = `translateY(${scrolled * 0.4}px) scale(1.05)`; }
     });
 </script>
 

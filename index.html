@@ -7,166 +7,58 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;600&family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-color: #f8fafd;
-            --accent-yellow: #fdfd96; 
-            --main-text: #2c3e50;
-            --sub-text: #7f8c8d;
-        }
-
+        /* 基本スタイルは維持 */
+        :root { --bg-color: #f8fafd; --accent-yellow: #fdfd96; --main-text: #2c3e50; --sub-text: #7f8c8d; }
         html { scroll-behavior: smooth; }
-
-        body {
-            margin: 0;
-            background-color: var(--bg-color);
-            color: var(--main-text);
-            font-family: 'Noto Serif JP', serif;
-            line-height: 1.8;
-            overflow-x: hidden;
-            opacity: 0;
-            animation: pageFadeIn 1.5s ease-out forwards;
-        }
-
+        body { margin: 0; background-color: var(--bg-color); color: var(--main-text); font-family: 'Noto Serif JP', serif; line-height: 1.8; opacity: 0; animation: pageFadeIn 1.5s ease-out forwards; }
         @keyframes pageFadeIn { to { opacity: 1; } }
-
-        /* Hero Section */
-        header {
-            height: 100vh;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        .hero-bg {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: url('artist-photo.jpg') center/cover no-repeat;
-            filter: brightness(0.8);
-            z-index: -1;
-            transform: scale(1.05);
-            transition: transform 0.1s ease-out;
-        }
-
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        
+        /* 共通コンポーネント */
+        header { height: 100vh; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('artist-photo.jpg') center/cover no-repeat; filter: brightness(0.8); z-index: -1; transform: scale(1.05); transition: transform 0.1s ease-out; }
         .hero-content { text-align: center; color: white; z-index: 1; }
+        .main-emblem { width: 280px; height: auto; margin-bottom: 20px; filter: drop-shadow(0 0 15px rgba(255,255,255,0.3)); animation: float 6s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        h1 { font-family: 'Montserrat', sans-serif; font-size: 3rem; letter-spacing: 0.5rem; margin: 0; font-weight: 300; opacity: 0; animation: textFadeIn 2s ease-out 0.5s forwards; }
+        @keyframes textFadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .main-emblem {
-            width: 280px;
-            height: auto;
-            margin-bottom: 20px;
-            filter: drop-shadow(0 0 15px rgba(255,255,255,0.3));
-            animation: float 6s ease-in-out infinite;
-        }
+        nav { position: sticky; top: 0; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); padding: 20px; display: flex; justify-content: center; gap: 40px; z-index: 100; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; letter-spacing: 0.1rem; }
+        nav a:hover { color: #70a1ff; }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-        }
-
-        h1 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 3rem;
-            letter-spacing: 0.5rem;
-            margin: 0;
-            font-weight: 300;
-            opacity: 0;
-            animation: textFadeIn 2s ease-out 0.5s forwards;
-        }
-
-        @keyframes textFadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Navigation */
-        nav {
-            position: sticky;
-            top: 0;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            z-index: 100;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.9rem;
-            letter-spacing: 0.1rem;
-            transition: all 0.3s ease;
-        }
-
-        nav a { color: var(--main-text); text-decoration: none; position: relative; }
-        nav a::after {
-            content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 1px;
-            background: var(--main-text); transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-        nav a:hover::after { width: 100%; }
-
-        /* Sections */
         section { padding: 120px 20px; max-width: 1000px; margin: auto; }
-        h2 {
-            text-align: center; font-family: 'Montserrat', sans-serif; font-weight: 300;
-            font-size: 2rem; margin-bottom: 60px; letter-spacing: 0.3rem;
-        }
+        h2 { text-align: center; font-family: 'Montserrat', sans-serif; font-weight: 300; font-size: 2rem; margin-bottom: 60px; letter-spacing: 0.3rem; }
+        
+        /* ライブリストのデザイン */
+        .live-item { background: white; padding: 25px; margin-bottom: 20px; border-radius: 4px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); display: flex; flex-wrap: wrap; align-items: center; gap: 20px; border-left: 4px solid var(--accent-yellow); transition: transform 0.3s; }
+        .live-item:hover { transform: translateX(10px); }
+        .live-date { font-family: 'Montserrat', sans-serif; font-weight: bold; font-size: 1.2rem; min-width: 140px; }
+        .live-info { flex: 1; }
+        .live-title { font-weight: bold; font-size: 1.1rem; margin-bottom: 5px; display: block;}
+        .live-place { font-size: 0.9rem; color: var(--sub-text); }
+        .live-actions { display: flex; gap: 10px; }
+        .btn { padding: 8px 20px; border-radius: 30px; font-size: 0.8rem; font-family: 'Montserrat', sans-serif; border: 1px solid var(--main-text); cursor: pointer; background: transparent; }
+        .btn:hover { background: var(--main-text); color: white; }
+        .btn-flyer { border-color: #70a1ff; color: #70a1ff; }
+        .btn-flyer:hover { background: #70a1ff; color: white; }
 
-        .reveal { opacity: 0; transform: translateY(40px); transition: all 1s cubic-bezier(0.16, 1, 0.3, 1); }
-        .reveal.active { opacity: 1; transform: translateY(0); }
+        /* フライヤーモーダル（ポップアップ） */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
+        .modal-content { max-width: 90%; max-height: 90%; animation: zoomIn 0.3s; }
+        .close { position: absolute; top: 20px; right: 35px; color: #f1f1f1; font-size: 40px; font-weight: bold; cursor: pointer; }
+        @keyframes zoomIn { from {transform:scale(0)} to {transform:scale(1)} }
 
-        /* DISCOGRAPHY */
+        /* その他セクション */
         .disc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
-        .disc-item {
-            background: white; padding: 20px; border-radius: 4px;
-            box-shadow: 10px 10px 0px rgba(253, 253, 150, 0.4);
-            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease;
-        }
-        .disc-item:hover { transform: translateY(-8px); box-shadow: 15px 15px 0px rgba(173, 216, 230, 0.4); }
-        .disc-item img { width: 100%; height: auto; display: block; margin-bottom: 20px; border-radius: 2px; }
-
-        /* VIDEO */
-        .video-wrapper {
-            position: relative; padding-bottom: 56.25%; height: 0;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.1); border-radius: 4px; overflow: hidden;
-            transition: transform 0.5s ease;
-        }
-        .video-wrapper:hover { transform: scale(1.01); }
+        .disc-item { background: white; padding: 20px; border-radius: 4px; box-shadow: 10px 10px 0px rgba(253, 253, 150, 0.4); text-align: center; }
+        .disc-item img { width: 100%; margin-bottom: 20px; }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-
-        /* SNS & Contact */
-        .social-area {
-            text-align: center; font-size: 2rem; display: flex; justify-content: center; gap: 40px; margin-bottom: 40px;
-        }
-        .social-area a { color: var(--main-text); transition: transform 0.3s, color 0.3s; }
-        .social-area a:hover { transform: translateY(-5px); color: #70a1ff; }
-
-        /* Google Form Custom Style */
-        .form-section {
-            background: white;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            margin-top: 40px;
-        }
-        .form-title {
-            text-align: center; font-family: 'Montserrat', sans-serif; margin-bottom: 20px; font-size: 1.2rem; letter-spacing: 0.1rem;
-        }
-        .google-form-container {
-            position: relative;
-            width: 100%;
-            height: 800px; /* フォームの長さに応じて調整してください */
-            overflow: hidden;
-        }
-        .google-form-container iframe {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;
-        }
-
-        footer { text-align: center; padding: 80px 20px; font-size: 0.8rem; color: var(--sub-text); letter-spacing: 0.1rem; }
-
+        .social-area { text-align: center; font-size: 2rem; display: flex; justify-content: center; gap: 40px; margin-bottom: 40px; }
+        footer { text-align: center; padding: 60px; font-size: 0.8rem; color: var(--sub-text); }
+        
         @media (max-width: 768px) {
-            h1 { font-size: 2rem; } .main-emblem { width: 200px; }
-            nav { gap: 15px; font-size: 0.7rem; } section { padding: 80px 20px; }
-            .form-section { padding: 20px; }
-            .google-form-container { height: 950px; /* スマホの場合は縦長になるので高さを増やす */ }
+            h1 { font-size: 2rem; } .main-emblem { width: 200px; } .live-item { flex-direction: column; align-items: flex-start; } .live-actions { width: 100%; justify-content: flex-start; margin-top: 10px; }
         }
     </style>
 </head>
@@ -187,12 +79,17 @@
     <a href="#contact">CONTACT</a>
 </nav>
 
-<section id="news" class="reveal">
+<section id="news">
     <h2>NEWS / LIVE</h2>
-    <p style="text-align: center; color: var(--sub-text);">現在、新しい情報を準備中です。</p>
+    <div id="live-list">
+        <p style="text-align:center;">Loading...</p>
+    </div>
+    <div style="text-align: center; margin-top: 40px;">
+        <a href="archive.html" class="btn">PAST LIVE ARCHIVE >></a>
+    </div>
 </section>
 
-<section id="discography" class="reveal">
+<section id="discography">
     <h2>DISCOGRAPHY</h2>
     <div class="disc-grid">
         <div class="disc-item">
@@ -200,61 +97,100 @@
             <h3>landscape</h3>
             <p style="font-size: 0.9rem; color: var(--sub-text);">1st Digital Single</p>
             <div style="margin-top: 15px;">
-                <a href="https://www.youtube.com/watch?v=URuOQ6ymR_Y" target="_blank" style="font-size: 1.1rem; color: var(--main-text); text-decoration: none;">
-                    <i class="fab fa-youtube"></i> Music Video
-                </a>
+                <a href="https://www.youtube.com/watch?v=URuOQ6ymR_Y" target="_blank" class="btn"><i class="fab fa-youtube"></i> MV</a>
             </div>
         </div>
     </div>
 </section>
 
-<section id="video" class="reveal">
+<section id="video">
     <h2>VIDEO</h2>
     <div class="video-wrapper">
-        <iframe src="https://www.youtube.com/embed/URuOQ6ymR_Y" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <iframe src="https://www.youtube.com/embed/URuOQ6ymR_Y" frameborder="0" allowfullscreen></iframe>
     </div>
 </section>
 
-<section id="contact" class="reveal">
+<section id="contact">
     <h2>SNS / CONTACT</h2>
     <div class="social-area">
         <a href="https://www.youtube.com/@shinoefuhi" target="_blank"><i class="fab fa-youtube"></i></a>
         <a href="https://twitter.com/" target="_blank"><i class="fab fa-x-twitter"></i></a>
         <a href="https://www.instagram.com/" target="_blank"><i class="fab fa-instagram"></i></a>
     </div>
-    
-    <p style="text-align: center; margin-bottom: 40px;">
-        出演依頼・お問い合わせ：<br>
-        <a href="mailto:info@shinoefuhi.com" style="color: var(--main-text); text-decoration: underline;">info@shinoefuhi.com</a>
-    </p>
-
-    <div class="form-section">
-        <div class="form-title">TICKET RESERVATION</div>
-        <div class="google-form-container">
-            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfD_dummy_url_please_replace_this/viewform?embedded=true" width="640" height="800" frameborder="0" marginheight="0" marginwidth="0">読み込んでいます…</iframe>
-        </div>
-    </div>
+    <p style="text-align: center;">info@shinoefuhi.com</p>
 </section>
 
 <footer>
-    <div class="reveal">
-        &copy; 2026 shinoefuhi.
-    </div>
+    &copy; 2026 shinoefuhi.
 </footer>
 
+<div id="flyerModal" class="modal">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <img class="modal-content" id="modalImg">
+</div>
+
 <script>
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) { entry.target.classList.add('active'); }
+    // ライブ情報を取得して表示する魔法のスクリプト
+    fetch('lives.json')
+        .then(response => response.json())
+        .then(data => {
+            const listContainer = document.getElementById('live-list');
+            listContainer.innerHTML = ''; // Loadingを消す
+            
+            // 日付でソート（近い順）
+            data.sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            const today = new Date();
+            today.setHours(0,0,0,0); // 今日の0時を基準に
+
+            let hasFutureLives = false;
+
+            data.forEach(live => {
+                const liveDate = new Date(live.date);
+                // 未来のライブのみ表示
+                if (liveDate >= today) {
+                    hasFutureLives = true;
+                    const liveHtml = `
+                        <div class="live-item">
+                            <div class="live-date">${live.date.replace(/-/g, '.')} <br><span style="font-size:0.8em; font-weight:normal;">${live.time}</span></div>
+                            <div class="live-info">
+                                <span class="live-title">${live.title}</span>
+                                <span class="live-place">@ ${live.place}</span>
+                            </div>
+                            <div class="live-actions">
+                                ${live.flyer ? `<button class="btn btn-flyer" onclick="openModal('${live.flyer}')">FLYER</button>` : ''}
+                                ${live.ticketUrl ? `<a href="${live.ticketUrl}" target="_blank" class="btn">TICKET</a>` : ''}
+                            </div>
+                        </div>
+                    `;
+                    listContainer.innerHTML += liveHtml;
+                }
+            });
+
+            if (!hasFutureLives) {
+                listContainer.innerHTML = '<p style="text-align:center;">現在予定されているライブはありません。</p>';
+            }
         });
-    }, { threshold: 0.15 });
 
-    document.querySelectorAll('.reveal').forEach(element => { observer.observe(element); });
+    // モーダル操作
+    function openModal(imgSrc) {
+        document.getElementById('modalImg').src = imgSrc;
+        document.getElementById('flyerModal').style.display = "flex";
+    }
+    function closeModal() {
+        document.getElementById('flyerModal').style.display = "none";
+    }
+    // 外側クリックで閉じる
+    window.onclick = function(event) {
+        if (event.target == document.getElementById('flyerModal')) {
+            closeModal();
+        }
+    }
 
+    // パララックス
     window.addEventListener('scroll', () => {
-        const scrolled = window.pageYOffset;
         const bg = document.getElementById('hero-bg');
-        if(bg) { bg.style.transform = `translateY(${scrolled * 0.4}px) scale(1.05)`; }
+        if(bg) bg.style.transform = `translateY(${window.pageYOffset * 0.4}px) scale(1.05)`;
     });
 </script>
 

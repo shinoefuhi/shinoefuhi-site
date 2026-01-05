@@ -216,75 +216,65 @@ allowfullscreen></iframe>
 <footer>&copy; 2026 shinoefuhi.</footer>
 
 <script>
-const REPO="shinoefuhi/shinoefuhi-site";
-const today=new Date().setHours(0,0,0,0);
-
-async function loadYAML(url){
- const res=await fetch(url);
+async function loadJSON(url){
+ const res = await fetch(url);
  if(!res.ok) throw new Error();
- return jsyaml.load(await res.text());
+ return res.json();
 }
 
 async function loadLives(){
- const list=document.getElementById('live-list');
+ const list = document.getElementById("live-list");
  try{
-  const files=await fetch(`https://api.github.com/repos/${REPO}/contents/_data/lives`).then(r=>r.json());
-  const items=await Promise.all(files.map(f=>loadYAML(f.download_url)));
-  const future=items.filter(i=>new Date(i.date)>=today);
-  if(!future.length) throw 0;
-  list.innerHTML="";
-  future.forEach(l=>{
-   const el=document.createElement('div');
-   el.className='live-item';
-   el.innerHTML=`
-    <div class="live-date">${l.date.replace(/-/g,'.')}</div>
-    <div class="live-info">
-     <div><strong>${l.title}</strong></div>
-     <div style="color:var(--sub)">@ ${l.place}</div>
-    </div>
-    ${l.ticketUrl?`<a class="btn" href="${l.ticketUrl}" target="_blank">TICKET</a>`:''}
-   `;
-   list.appendChild(el);
+  const lives = await loadJSON("/data/lives.json");
+  const today = new Date().setHours(0,0,0,0);
+  const future = lives.filter(l => new Date(l.date) >= today);
+
+  if(!future.length){
+    list.innerHTML = "<p style='text-align:center'>現在予定されているライブはありません。</p>";
+    return;
+  }
+
+  list.innerHTML = "";
+  future.forEach(l => {
+    const el = document.createElement("div");
+    el.className = "live-item";
+    el.innerHTML = `
+      <div class="live-date">${l.date.replace(/-/g,'.')}</div>
+      <div class="live-info">
+        <strong>${l.title}</strong><br>
+        <span style="color:#777">@ ${l.place}</span>
+      </div>
+      ${l.ticketUrl ? `<a href="${l.ticketUrl}" target="_blank" class="btn">TICKET</a>` : ""}
+    `;
+    list.appendChild(el);
   });
  }catch{
-  list.innerHTML='<p style="text-align:center">現在予定されているライブはありません。</p>';
+  list.innerHTML = "<p style='text-align:center'>読み込みに失敗しました。</p>";
  }
 }
 
-async function loadDisc(){
- const grid=document.getElementById('disc-list');
- const files=await fetch(`https://api.github.com/repos/${REPO}/contents/_data/discography`).then(r=>r.json());
- for(const f of files){
-  const d=await loadYAML(f.download_url);
-  const el=document.createElement('div');
-  el.className='disc-item';
-  el.innerHTML=`
-   <img src="${d.image}" alt="${d.title}">
-   <h3>${d.title}</h3>
-   <div class="social-links">
-    ${d.youtube?`<a href="${d.youtube}" target="_blank"><i class="fab fa-youtube"></i></a>`:''}
-    ${d.appleMusic?`<a href="${d.appleMusic}" target="_blank"><i class="fab fa-apple"></i></a>`:''}
-    ${d.spotify?`<a href="${d.spotify}" target="_blank"><i class="fab fa-spotify"></i></a>`:''}
-   </div>
+async function loadDiscography(){
+ const grid = document.getElementById("disc-list");
+ const discs = await loadJSON("/data/discography.json");
+
+ discs.forEach(d => {
+  const el = document.createElement("div");
+  el.className = "disc-item";
+  el.innerHTML = `
+    <img src="${d.image}" alt="${d.title}">
+    <h3>${d.title}</h3>
+    <div class="social-links">
+      ${d.youtube ? `<a href="${d.youtube}"><i class="fab fa-youtube"></i></a>` : ""}
+      ${d.spotify ? `<a href="${d.spotify}"><i class="fab fa-spotify"></i></a>` : ""}
+    </div>
   `;
   grid.appendChild(el);
- }
+ });
 }
 
-let ticking=false;
-window.addEventListener('scroll',()=>{
- if(!ticking){
-  requestAnimationFrame(()=>{
-   const bg=document.getElementById('hero-bg');
-   bg.style.transform=`translateY(${scrollY*0.35}px) scale(1.05)`;
-   ticking=false;
-  });
-  ticking=true;
- }
-});
-
 loadLives();
-loadDisc();
+loadDiscography();
 </script>
+
 </body>
 </html>

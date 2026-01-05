@@ -8,10 +8,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;600&family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #f8fafd; /* 非常に淡い青 */
+            --bg-color: #f8fafd;
             --accent-yellow: #fdfd96; 
             --main-text: #2c3e50;
             --sub-text: #7f8c8d;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
@@ -20,9 +24,17 @@
             color: var(--main-text);
             font-family: 'Noto Serif JP', serif;
             line-height: 1.8;
+            overflow-x: hidden;
+            opacity: 0;
+            animation: pageFadeIn 1.5s ease-out forwards;
         }
 
-        /* Hero Section - アー写を背景に */
+        /* ページ全体のフェードイン */
+        @keyframes pageFadeIn {
+            to { opacity: 1; }
+        }
+
+        /* Hero Section - パララックス効果と有機的な動き */
         header {
             height: 100vh;
             position: relative;
@@ -36,20 +48,31 @@
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             background: url('artist-photo.jpg') center/cover no-repeat;
-            filter: brightness(0.8); /* 少し暗くして文字を見やすく */
+            filter: brightness(0.8);
             z-index: -1;
+            /* スクロール時に背景が少し遅れて動くパララックス効果はJSで制御 */
+            transform: scale(1.05);
+            transition: transform 0.1s ease-out;
         }
 
         .hero-content {
             text-align: center;
             color: white;
+            z-index: 1;
         }
 
+        /* エンブレムの浮遊アニメーション */
         .main-emblem {
-            width: 280px; /* エンブレムを印象的に配置 */
+            width: 280px;
             height: auto;
             margin-bottom: 20px;
             filter: drop-shadow(0 0 15px rgba(255,255,255,0.3));
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
         }
 
         h1 {
@@ -58,14 +81,21 @@
             letter-spacing: 0.5rem;
             margin: 0;
             font-weight: 300;
+            opacity: 0;
+            animation: textFadeIn 2s ease-out 0.5s forwards;
+        }
+
+        @keyframes textFadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Navigation */
         nav {
             position: sticky;
             top: 0;
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px); /* すりガラス効果を強化 */
             padding: 20px;
             display: flex;
             justify-content: center;
@@ -74,11 +104,34 @@
             font-family: 'Montserrat', sans-serif;
             font-size: 0.9rem;
             letter-spacing: 0.1rem;
+            transition: all 0.3s ease;
         }
 
-        /* 各セクションの余白と装飾 */
+        nav a {
+            color: var(--main-text);
+            text-decoration: none;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--main-text);
+            transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        /* セクション共通 */
         section {
-            padding: 100px 20px;
+            padding: 120px 20px;
             max-width: 1000px;
             margin: auto;
         }
@@ -90,9 +143,25 @@
             font-size: 2rem;
             margin-bottom: 60px;
             letter-spacing: 0.3rem;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        /* スクロール連動アニメーション用のクラス */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1); /* 慣性のある滑らかな動き */
         }
 
-        /* ディスコグラフィー（エンブレムの雰囲気をカードに） */
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* DISCOGRAPHY */
         .disc-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -102,22 +171,37 @@
         .disc-item {
             background: white;
             padding: 20px;
-            border-radius: 2px;
-            box-shadow: 10px 10px 0px var(--accent-yellow); /* 淡い黄色の影でおしゃれに */
-            transition: 0.3s;
+            border-radius: 4px;
+            box-shadow: 10px 10px 0px rgba(253, 253, 150, 0.4); /* 黄色を少し透明に */
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease;
         }
 
         .disc-item:hover {
-            transform: translate(-5px, -5px);
-            box-shadow: 15px 15px 0px #add8e6; /* ホバーで淡い青に変化 */
+            transform: translateY(-8px);
+            box-shadow: 15px 15px 0px rgba(173, 216, 230, 0.4); /* 青を少し透明に */
         }
 
-        /* YouTube 埋め込み */
+        .disc-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            margin-bottom: 20px;
+            border-radius: 2px;
+        }
+
+        /* VIDEO */
         .video-wrapper {
             position: relative;
             padding-bottom: 56.25%;
             height: 0;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            transition: transform 0.5s ease;
+        }
+        
+        .video-wrapper:hover {
+            transform: scale(1.01);
         }
 
         .video-wrapper iframe {
@@ -131,28 +215,40 @@
             font-size: 2rem;
             display: flex;
             justify-content: center;
-            gap: 30px;
+            gap: 40px;
             margin-bottom: 40px;
+        }
+        
+        .social-area a {
+            color: var(--main-text);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.3s;
+        }
+
+        .social-area a:hover {
+            transform: translateY(-5px);
+            color: #70a1ff; /* 淡い青のアクセント */
         }
 
         footer {
             text-align: center;
-            padding: 60px;
+            padding: 80px 20px;
             font-size: 0.8rem;
             color: var(--sub-text);
+            letter-spacing: 0.1rem;
         }
 
         @media (max-width: 768px) {
             h1 { font-size: 2rem; }
             .main-emblem { width: 200px; }
             nav { gap: 15px; font-size: 0.7rem; }
+            section { padding: 80px 20px; }
         }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="hero-bg"></div>
+    <div class="hero-bg" id="hero-bg"></div>
     <div class="hero-content">
         <img src="emblem.png" alt="shinoefuhi emblem" class="main-emblem">
         <h1>shinoefuhi</h1>
@@ -161,37 +257,40 @@
 
 <nav>
     <a href="#news">NEWS</a>
-    <a href="#music">MUSIC</a>
+    <a href="#discography">DISCOGRAPHY</a>
     <a href="#video">VIDEO</a>
     <a href="#contact">CONTACT</a>
 </nav>
 
-<section id="news">
+<section id="news" class="reveal">
     <h2>NEWS / LIVE</h2>
     <p style="text-align: center; color: var(--sub-text);">現在、新しい情報を準備中です。</p>
 </section>
 
-<section id="music">
+<section id="discography" class="reveal">
     <h2>DISCOGRAPHY</h2>
     <div class="disc-grid">
         <div class="disc-item">
-            <div style="aspect-ratio: 1/1; background: #eee; margin-bottom: 20px;">
-                <img src="emblem.jpg" style="width:100%; opacity: 0.5;">
+            <img src="emblem.png" alt="landscape jacket">
+            <h3>landscape</h3>
+            <p style="font-size: 0.9rem; color: var(--sub-text);">1st Digital Single</p>
+            <div style="margin-top: 15px;">
+                <a href="https://www.youtube.com/watch?v=URuOQ6ymR_Y" target="_blank" style="font-size: 1.1rem; color: var(--main-text); text-decoration: none;">
+                    <i class="fab fa-youtube"></i> Music Video
+                </a>
             </div>
-            <h3>Coming Soon</h3>
-            <p style="font-size: 0.9rem; color: var(--sub-text);">楽曲の配信をお楽しみに。</p>
         </div>
     </div>
 </section>
 
-<section id="video">
+<section id="video" class="reveal">
     <h2>VIDEO</h2>
     <div class="video-wrapper">
         <iframe src="https://www.youtube.com/embed/URuOQ6ymR_Y" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     </div>
 </section>
 
-<section id="contact" style="text-align: center;">
+<section id="contact" style="text-align: center;" class="reveal">
     <h2>SNS / CONTACT</h2>
     <div class="social-area">
         <a href="https://www.youtube.com/@shinoefuhi" target="_blank"><i class="fab fa-youtube"></i></a>
@@ -202,8 +301,36 @@
 </section>
 
 <footer>
-    &copy; 2026 shinoefuhi.
+    <div class="reveal">
+        &copy; 2026 shinoefuhi.
+    </div>
 </footer>
+
+<script>
+    // スクロールに合わせて要素をふわっと表示させる（有機的な動きの肝）
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+            }
+        });
+    }, {
+        threshold: 0.15 // 画面の15%が見えたら発動
+    });
+
+    document.querySelectorAll('.reveal').forEach(element => {
+        observer.observe(element);
+    });
+
+    // 背景画像のパララックス効果（スクロール速度とずらす）
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        const bg = document.getElementById('hero-bg');
+        if(bg) {
+            bg.style.transform = `translateY(${scrolled * 0.4}px) scale(1.05)`;
+        }
+    });
+</script>
 
 </body>
 </html>

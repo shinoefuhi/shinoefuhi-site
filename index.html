@@ -56,68 +56,80 @@
 </section>
 
 <script>
-// --- 管理画面のデータを取得して表示するプログラム ---
+<script>
+    // 1. LIVE情報の取得（ダッシュボードで入力したデータを読み込む）
+    const liveList = document.getElementById('live-list');
+    fetch('https://api.github.com/repos/shinoefuhi/shinoefuhi-site/contents/_data/lives')
+        .then(res => res.json())
+        .then(files => {
+            liveList.innerHTML = ''; 
+            const today = new Date().toISOString().split('T')[0];
 
-// 1. ライブ情報の読み込み
-fetch('https://api.github.com/repos/shinoefuhi/shinoefuhi-site/contents/_data/lives')
-    .then(res => res.json())
-    .then(files => {
-        const list = document.getElementById('live-list');
-        list.innerHTML = ''; // クリア
-        files.forEach(file => {
-            fetch(file.download_url)
-                .then(r => r.text())
-                .then(yamlText => {
-                    // 簡易的なデータ抽出（本来はYAMLライブラリを使いますが、軽量化のため）
-                    const date = yamlText.match(/date: "(.+)"/)?.[1] || "";
+            files.forEach(file => {
+                fetch(file.download_url).then(r => r.text()).then(yaml => {
+                    const date = yaml.match(/date: "(.+)"/)?.[1] || "";
                     const title = yamlText.match(/title: "(.+)"/)?.[1] || "";
-                    const place = yamlText.match(/place: "(.+)"/)?.[1] || "";
-                    const url = yamlText.match(/ticketUrl: "(.+)"/)?.[1] || "";
-                    
-                    list.innerHTML += `
-                        <div class="live-item">
-                            <div class="live-date">${date.replace(/-/g, '.')}</div>
-                            <div class="live-info">
-                                <div class="live-title">${title}</div>
-                                <div class="live-place">${place}</div>
-                            </div>
-                            ${url ? `<a href="${url}" class="ticket-btn" target="_blank">TICKET</a>` : ''}
-                        </div>
-                    `;
+                    const place = yaml.match(/place: "(.+)"/)?.[1] || "";
+                    const time = yaml.match(/time: "(.+)"/)?.[1] || "";
+                    const flyer = yaml.match(/flyer: "(.+)"/)?.[1] || "";
+                    const url = yaml.match(/ticketUrl: "(.+)"/)?.[1] || "";
+
+                    if (date >= today) {
+                        liveList.innerHTML += `
+                            <div class="live-item">
+                                <div class="live-date">${date.replace(/-/g, '.')} <br><span style="font-size:0.8em; font-weight:normal;">${time}</span></div>
+                                <div class="live-info">
+                                    <span class="live-title">${title}</span>
+                                    <span class="live-place">@ ${place}</span>
+                                </div>
+                                <div class="live-actions">
+                                    ${flyer ? `<button class="btn btn-flyer" onclick="openModal('${flyer}')">FLYER</button>` : ''}
+                                    ${url ? `<a href="${url}" target="_blank" class="btn">TICKET</a>` : ''}
+                                </div>
+                            </div>`;
+                    }
                 });
-        });
-    });
+            });
+        }).catch(() => { liveList.innerHTML = '<p>現在、ライブの予定はありません。</p>'; });
 
-// 2. 作品情報の読み込み
-fetch('https://api.github.com/repos/shinoefuhi/shinoefuhi-site/contents/_data/discography')
-    .then(res => res.json())
-    .then(files => {
-        const list = document.getElementById('disc-list');
-        list.innerHTML = '';
-        files.forEach(file => {
-            fetch(file.download_url)
-                .then(r => r.text())
-                .then(yamlText => {
-                    const title = yamlText.match(/title: "(.+)"/)?.[1] || "";
-                    const img = yamlText.match(/image: "(.+)"/)?.[1] || "";
-                    const apple = yamlText.match(/appleMusic: "(.+)"/)?.[1] || "";
-                    const spotify = yamlText.match(/spotify: "(.+)"/)?.[1] || "";
-                    const youtube = yamlText.match(/youtube: "(.+)"/)?.[1] || "";
+    // 2. DISCOGRAPHYの取得（ダッシュボードで入力したデータを読み込む）
+    const discGrid = document.querySelector('.disc-grid');
+    fetch('https://api.github.com/repos/shinoefuhi/shinoefuhi-site/contents/_data/discography')
+        .then(res => res.json())
+        .then(files => {
+            discGrid.innerHTML = '';
+            files.forEach(file => {
+                fetch(file.download_url).then(r => r.text()).then(yaml => {
+                    const title = yaml.match(/title: "(.+)"/)?.[1] || "";
+                    const img = yaml.match(/image: "(.+)"/)?.[1] || "";
+                    const type = yaml.match(/type: "(.+)"/)?.[1] || "";
+                    const apple = yaml.match(/appleMusic: "(.+)"/)?.[1] || "";
 
-                    list.innerHTML += `
+                    discGrid.innerHTML += `
                         <div class="disc-item">
                             <img src="${img}" alt="${title}">
                             <h3>${title}</h3>
-                            <div class="streaming-links">
-                                ${apple ? `<a href="${apple}" target="_blank"><i class="fab fa-apple"></i></a>` : ''}
-                                ${spotify ? `<a href="${spotify}" target="_blank"><i class="fab fa-spotify"></i></a>` : ''}
-                                ${youtube ? `<a href="${youtube}" target="_blank"><i class="fab fa-youtube"></i></a>` : ''}
+                            <p style="font-size: 0.9rem; color: var(--sub-text);">${type}</p>
+                            <div style="margin-top: 15px;">
+                                ${apple ? `<a href="${apple}" target="_blank" class="btn">LISTEN</a>` : ''}
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                 });
+            });
         });
+
+    // モーダル・パララックス制御
+    function openModal(imgSrc) {
+        document.getElementById('modalImg').src = imgSrc;
+        document.getElementById('flyerModal').style.display = "flex";
+    }
+    function closeModal() { document.getElementById('flyerModal').style.display = "none"; }
+    window.onclick = function(e) { if (e.target == document.getElementById('flyerModal')) closeModal(); }
+    window.addEventListener('scroll', () => {
+        const bg = document.getElementById('hero-bg');
+        if(bg) bg.style.transform = `translateY(${window.pageYOffset * 0.4}px) scale(1.05)`;
     });
+</script>
 </script>
 
 </body>

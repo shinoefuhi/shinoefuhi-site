@@ -1,75 +1,115 @@
 <script>
     const REPO = "shinoefuhi/shinoefuhi-site";
 
-    // 1. ライブ情報の取得
-    fetch(`https://api.github.com/repos/${REPO}/contents/_data/lives`)
-    .then(res => res.ok ? res.json() : []) // フォルダがなくても空配列を返す
-    .then(files => {
-        const list = document.getElementById('live-list');
-        list.innerHTML = ''; 
+    // ページ読み込み完了後に実行
+    window.addEventListener('DOMContentLoaded', () => {
+        const liveList = document.getElementById('live-list');
+        const discList = document.getElementById('disc-list');
 
-        // filesが配列でない（データがない）場合の処理
-        if (!Array.isArray(files) || files.length === 0) {
-            list.innerHTML = '<p style="text-align:center;">現在予定されているライブはありません。</p>';
-            addArchiveLink(list);
-            return;
+        // 1. ライブ情報の取得と表示
+        if (liveList) {
+            fetch(`https://api.github.com/repos/${REPO}/contents/_data/lives`)
+            .then(res => res.ok ? res.json() : [])
+            .then(files => {
+                if (!Array.isArray(files) || files.length === 0) {
+                    liveList.innerHTML = '<p style="text-align:center;">現在予定されているライブはありません。</p>';
+                    addArchiveLink(liveList);
+                    return;
+                }
+
+                liveList.innerHTML = ''; // Loading消去
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                let hasFutureLives = false;
+
+                // すべてのYAMLファイルを個別に取得
+                Promise.all(files.map(file => fetch(file.download_url).then(r => r.text())))
+                .then(yamls => {
+                    yamls.forEach(yaml => {
+                        const getValue = (key) => {
+                            const reg = new RegExp(`${key}:\\s*"?([^"\\n]+)"?`);
+                            const match = yaml.match(reg);
+                            return match ? match[1] : "";
+                        };
+
+                        const dateStr = getValue("date");
+                        if (!dateStr) return;
+                        const liveDate = new Date(dateStr);
+                        
+                        if (liveDate >= today) {
+                            hasFutureLives = true;
+                            const open = getValue("open_time"), 
+                                  start = getValue("start_time"), 
+                                  price = getValue("price"), 
+                                  title = getValue("title"), 
+                                  place = getValue("place"), 
+                                  artists = getValue("artists"), 
+                                  url = getValue("ticketUrl");
+
+                            liveList.innerHTML += `
+                                <div class="live-item">
+                                    <div class="live-date">
+                                        ${dateStr.replace(/-/g, '.')}
+                                        <div style="font-size: 0.75rem; font-weight: normal; margin-top: 5px; color: var(--sub-text);">
+                                            ${open ? `OPEN ${open}` : ''}${open && start ? ' / ' : ''}${start ? `START ${start}` : ''}
+                                        </div>
+                                    </div>
+                                    <div class="live-info">
+                                        <span class="live-title">${title}</span>
+                                        ${place ? `<span class="live-place">@ ${place}</span>` : ''}
+                                        ${artists ? `<div style="font-size: 0.85rem; color: var(--sub-text); margin-top: 3px;">w / ${artists}</div>` : ''}
+                                        ${price ? `<div style="font-size: 0.8rem; color: var(--sub-text); margin-top: 5px;"><i class="fa-solid fa-ticket" style="font-size:0.7rem; margin-right:3px;"></i>${price}</div>` : ''}
+                                    </div>
+                                    <div class="live-actions">
+                                        ${url ? `<a href="${url}" target="_blank" class="btn">TICKET</a>` : ''}
+                                    </div>
+                                </div>`;
+                        }
+                    });
+
+                    if (!hasFutureLives) {
+                        liveList.innerHTML = '<p style="text-align:center;">現在予定されているライブはありません。</p>';
+                    }
+                    addArchiveLink(liveList);
+                });
+            })
+            .catch(() => {
+                liveList.innerHTML = '<p style="text-align:center;">現在予定されているライブはありません。</p>';
+                addArchiveLink(liveList);
+            });
         }
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        let hasFutureLives = false;
-
-        Promise.all(files.map(file => fetch(file.download_url).then(r => r.text())))
-        .then(yamls => {
-            yamls.forEach(yaml => {
-                const getValue = (key) => {
-                    const reg = new RegExp(`${key}:\\s*"?([^"\\n]+)"?`);
-                    const match = yaml.match(reg);
-                    return match ? match[1] : "";
-                };
-
-                const dateStr = getValue("date");
-                if(!dateStr) return;
-                const liveDate = new Date(dateStr);
-                
-                if (liveDate >= today) {
-                    hasFutureLives = true;
-                    const open = getValue("open_time"), start = getValue("start_time"), 
-                          price = getValue("price"), title = getValue("title"), 
-                          place = getValue("place"), artists = getValue("artists"), 
-                          url = getValue("ticketUrl");
-
-                    list.innerHTML += `
-                        <div class="live-item">
-                            <div class="live-date">
-                                ${dateStr.replace(/-/g, '.')}
-                                <div style="font-size: 0.75rem; font-weight: normal; margin-top: 5px; color: var(--sub-text);">
-                                    ${open ? `OPEN ${open}` : ''}${open && start ? ' / ' : ''}${start ? `START ${start}` : ''}
+        // 2. ディスコグラフィーの取得
+        if (discList) {
+            fetch(`https://api.github.com/repos/${REPO}/contents/_data/discography`)
+            .then(res => res.ok ? res.json() : [])
+            .then(files => {
+                if (!Array.isArray(files)) return;
+                files.forEach(file => {
+                    fetch(file.download_url).then(r => r.text()).then(yaml => {
+                        const title = (yaml.match(/title: "(.+)"/) || ["",""])[1];
+                        const img = (yaml.match(/image: "(.+)"/) || ["",""])[1];
+                        const yt = (yaml.match(/youtube: "(.+)"/) || ["",""])[1];
+                        const apple = (yaml.match(/appleMusic: "(.+)"/) || ["",""])[1];
+                        const spotify = (yaml.match(/spotify: "(.+)"/) || ["",""])[1];
+                        
+                        discList.innerHTML += `
+                            <div class="disc-item">
+                                <img src="${img}" alt="${title}">
+                                <h3>${title}</h3>
+                                <div class="social-links">
+                                    ${yt ? `<a href="${yt}" target="_blank"><i class="fab fa-youtube"></i></a>` : ''}
+                                    ${apple ? `<a href="${apple}" target="_blank"><i class="fab fa-apple"></i></a>` : ''}
+                                    ${spotify ? `<a href="${spotify}" target="_blank"><i class="fab fa-spotify"></i></a>` : ''}
                                 </div>
-                            </div>
-                            <div class="live-info">
-                                <span class="live-title">${title}</span>
-                                ${place ? `<span class="live-place">@ ${place}</span>` : ''}
-                                ${artists ? `<div style="font-size: 0.85rem; color: var(--sub-text); margin-top: 3px;">w / ${artists}</div>` : ''}
-                                ${price ? `<div style="font-size: 0.8rem; color: var(--sub-text); margin-top: 5px;"><i class="fa-solid fa-ticket" style="font-size:0.7rem; margin-right:3px;"></i>${price}</div>` : ''}
-                            </div>
-                            <div class="live-actions">
-                                ${url ? `<a href="${url}" target="_blank" class="btn">TICKET</a>` : ''}
-                            </div>
-                        </div>`;
-                }
+                            </div>`;
+                    });
+                });
             });
-
-            if (!hasFutureLives) {
-                list.innerHTML = '<p style="text-align:center;">現在予定されているライブはありません。</p>';
-            }
-            addArchiveLink(list);
-        });
-    }).catch(() => {
-        document.getElementById('live-list').innerHTML = '<p style="text-align:center;">現在予定されているライブはありません。</p>';
+        }
     });
 
-    // アーカイブリンクを追加する関数
+    // 共通：アーカイブリンク追加
     function addArchiveLink(target) {
         target.innerHTML += `
             <div style="text-align: center; margin-top: 40px;">
@@ -78,38 +118,11 @@
         `;
     }
 
-    // 2. 作品情報の取得
-    fetch(`https://api.github.com/repos/${REPO}/contents/_data/discography`)
-    .then(res => res.ok ? res.json() : [])
-    .then(files => {
-        const list = document.getElementById('disc-list');
-        if (!Array.isArray(files)) return;
-
-        files.forEach(file => {
-            if(!file.download_url) return;
-            fetch(file.download_url).then(r => r.text()).then(yaml => {
-                const title = yaml.match(/title: "(.+)"/)?.[1] || "";
-                const img = yaml.match(/image: "(.+)"/)?.[1] || "";
-                const yt = yaml.match(/youtube: "(.+)"/)?.[1] || "";
-                const apple = yaml.match(/appleMusic: "(.+)"/)?.[1] || "";
-                const spotify = yaml.match(/spotify: "(.+)"/)?.[1] || "";
-                list.innerHTML += `
-                    <div class="disc-item">
-                        <img src="${img}" alt="${title}">
-                        <h3>${title}</h3>
-                        <div class="social-links">
-                            ${yt ? `<a href="${yt}" target="_blank"><i class="fab fa-youtube"></i></a>` : ''}
-                            ${apple ? `<a href="${apple}" target="_blank"><i class="fab fa-apple"></i></a>` : ''}
-                            ${spotify ? `<a href="${spotify}" target="_blank"><i class="fab fa-spotify"></i></a>` : ''}
-                        </div>
-                    </div>`;
-            });
-        });
-    });
-
-    // パララックス効果
+    // 3. パララックス効果（背景写真の動き）
     window.addEventListener('scroll', () => {
         const bg = document.getElementById('hero-bg');
-        if(bg) bg.style.transform = `translateY(${window.pageYOffset * 0.4}px) scale(1.05)`;
+        if (bg) {
+            bg.style.transform = `translateY(${window.pageYOffset * 0.4}px) scale(1.05)`;
+        }
     });
 </script>

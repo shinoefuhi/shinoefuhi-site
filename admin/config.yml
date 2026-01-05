@@ -1,0 +1,35 @@
+backend:
+  name: github
+  repo: shinoefuhi/shinoefuhi-site # ご自身のリポジトリ名に合わせてください
+  branch: main
+
+media_folder: "images/uploads" # 画像が保存される場所
+public_folder: "/images/uploads"
+
+collections:
+  - name: "lives"
+    label: "LIVE情報"
+    folder: "_data/lives" # ライブデータを個別に保存する場所
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{title}}"
+    fields:
+      - {label: "公演日", name: "date", widget: "date"}
+      - {label: "時間", name: "time", widget: "string", default: "18:00 START"}
+      - {label: "タイトル", name: "title", widget: "string"}
+      - {label: "会場", name: "place", widget: "string"}
+      - {label: "チケットURL", name: "ticketUrl", widget: "string", required: false}
+      - {label: "フライヤー画像", name: "flyer", widget: "image", required: false}
+
+  - name: "discography"
+    label: "作品情報"
+    folder: "_data/discography"
+    create: true
+    slug: "{{title}}"
+    fields:
+      - {label: "タイトル", name: "title", widget: "string"}
+      - {label: "種別", name: "type", widget: "select", options: ["Digital Single", "EP", "Album"]}
+      - {label: "ジャケット画像", name: "image", widget: "image"}
+      - {label: "Apple Music URL", name: "appleMusic", widget: "string", required: false}
+      - {label: "Spotify URL", name: "spotify", widget: "string", required: false}
+      - {label: "YouTube URL", name: "youtube", widget: "string", required: false}
+      - {label: "CD詳細情報", name: "body", widget: "markdown", required: false}

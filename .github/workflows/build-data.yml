@@ -12,6 +12,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    # data ディレクトリを作成（★重要）
+    - name: Prepare data directory
+      run: mkdir -p data
+
     - name: Install yq
       run: sudo snap install yq
 

@@ -10,3 +10,23 @@
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
 </body>
 </html>
+<section>
+  <h2>Discography Editor</h2>
+
+  <div class="form">
+    <input id="disc-title" placeholder="タイトル">
+    <input id="disc-image" placeholder="ジャケット画像URL">
+    <input id="disc-youtube" placeholder="YouTube URL">
+    <input id="disc-spotify" placeholder="Spotify URL">
+    <input id="disc-apple" placeholder="Apple Music URL">
+    <button onclick="generateDiscography()">YAML生成</button>
+  </div>
+
+  <h3>Preview</h3>
+  <div id="disc-preview"></div>
+
+  <h3>YAML</h3>
+  <textarea id="disc-yaml" readonly></textarea>
+  <button onclick="copy('disc-yaml')">コピー</button>
+</section>
+

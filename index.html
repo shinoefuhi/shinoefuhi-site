@@ -120,29 +120,47 @@
     const REPO = "shinoefuhi/shinoefuhi-site";
 
     // 1. ライブ情報の取得
-    fetch(`https://api.github.com/repos/${REPO}/contents/_data/lives`)
+fetch(`https://api.github.com/repos/${REPO}/contents/_data/lives`)
     .then(res => res.json())
     .then(files => {
         const list = document.getElementById('live-list');
         list.innerHTML = '';
         files.forEach(file => {
             fetch(file.download_url).then(r => r.text()).then(yaml => {
-                const date = yaml.match(/date: "(.+)"/)?.[1] || "";
+                // --- 1. データを抽出する部分 ---
+                const date  = yaml.match(/date: "(.+)"/)?.[1] || "";
+                const open  = yaml.match(/open_time: "(.+)"/)?.[1] || "";
+                const start = yaml.match(/start_time: "(.+)"/)?.[1] || "";
+                const price = yaml.match(/price: "(.+)"/)?.[1] || "";
                 const title = yaml.match(/title: "(.+)"/)?.[1] || "";
                 const place = yaml.match(/place: "(.+)"/)?.[1] || "";
-                const url = yaml.match(/ticketUrl: "(.+)"/)?.[1] || "";
+                const artists = yaml.match(/artists: "(.+)"/)?.[1] || "";
+                const url   = yaml.match(/ticketUrl: "(.+)"/)?.[1] || "";
+
+                // --- 2. HTMLとして書き出す部分 ---
                 list.innerHTML += `
                     <div class="live-item">
-                        <div class="live-date">${date.replace(/-/g, '.')}</div>
+                        <div class="live-date">
+                            ${date.replace(/-/g, '.')}
+                            <div style="font-size: 0.75rem; font-weight: normal; margin-top: 5px; color: var(--sub-text);">
+                                ${open ? `OPEN ${open} / ` : ''}${start ? `START ${start}` : ''}
+                            </div>
+                        </div>
                         <div class="live-info">
                             <span class="live-title">${title}</span>
                             <span class="live-place">@ ${place}</span>
+                            ${artists ? `<div style="font-size: 0.85rem; color: var(--sub-text); margin-top: 3px;">w / ${artists}</div>` : ''}
+                            ${price ? `<div style="font-size: 0.8rem; color: var(--sub-text); margin-top: 5px;"><i class="fa-solid fa-ticket" style="font-size:0.7rem; margin-right:3px;"></i>${price}</div>` : ''}
                         </div>
-                        ${url ? `<a href="${url}" target="_blank" class="btn">TICKET</a>` : ''}
+                        <div class="live-actions">
+                            ${url ? `<a href="${url}" target="_blank" class="btn">TICKET</a>` : ''}
+                        </div>
                     </div>`;
             });
         });
-    }).catch(() => { document.getElementById('live-list').innerHTML = '<p style="text-align:center;">現在予定されているライブはありません。</p>'; });
+    }).catch(() => { 
+        document.getElementById('live-list').innerHTML = '<p style="text-align:center;">現在予定されているライブはありません。</p>'; 
+    });
 
     // 2. 作品情報の取得
     fetch(`https://api.github.com/repos/${REPO}/contents/_data/discography`)

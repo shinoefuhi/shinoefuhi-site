@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>shinoefuhi Admin (Direct)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+<style>
+    body { font-family: sans-serif; padding: 20px; background: #f4f7f9; color: #333; }
+    .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    h2 { border-bottom: 2px solid #ddd; padding-bottom: 10px; }
+    input, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box; }
+    button { background: #2c3e50; color: white; border: none; cursor: pointer; font-weight: bold; }
+    button:hover { background: #34495e; }
+    .token-section { background: #fff3cd; padding: 15px; border-radius: 4px; margin-bottom: 20px; font-size: 0.8rem; }
+    #status { font-weight: bold; text-align: center; margin-top: 15px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Live Information Editor</h2>
+    
+    <div class="token-section">
+        <strong>【初期設定】</strong> GitHubのトークンを入力してください（ブラウザに保存されます）。
+        <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxx">
+    </div>
+
+    <input id="live-date" type="date">
+    <input id="live-title" placeholder="ライブタイトル">
+    <input id="live-place" placeholder="会場名 (例: 渋谷WWW)">
+    <input id="live-open" placeholder="OPEN (例: 18:00)">
+    <input id="live-start" placeholder="START (例: 18:30)">
+    <input id="live-price" placeholder="料金 (例: ¥3,000)">
+    <input id="live-artists" placeholder="対バン/出演者">
+    <input id="live-url" placeholder="チケットURL">
+
+    <button onclick="saveToGitHub()">GitHubへ保存する</button>
+    <div id="status"></div>
+</div>
+
+<script>
+    const REPO = "shinoefuhi/shinoefuhi-site";
+
+    // 保存ボタンを押した時の処理
+    async function saveToGitHub() {
+        const token = document.getElementById('gh-token').value;
+        const status = document.getElementById('status');
+        
+        if (!token) { status.innerText = "❌ トークンを入力してください"; return; }
+        localStorage.setItem('gh_token_shino', token); // ブラウザに保存
+
+        const date = document.getElementById('live-date').value;
+        const title = document.getElementById('live-title').value;
+        if (!date || !title) { status.innerText = "❌ 日付とタイトルは必須です"; return; }
+
+        status.innerText = "⏳ 保存中...";
+
+        // YAMLデータの作成
+        const yamlContent = `date: "${date}"
+title: "${title}"
+place: "${document.getElementById('live-place').value}"
+open_time: "${document.getElementById('live-open').value}"
+start_time: "${document.getElementById('live-start').value}"
+price: "${document.getElementById('live-price').value}"
+artists: "${document.getElementById('live-artists').value}"
+ticketUrl: "${document.getElementById('live-url').value}"`;
+
+        const fileName = `${date}-${Math.random().toString(36).substring(7)}.yml`;
+        const path = `_data/lives/${fileName}`;
+        const url = `https://api.github.com/repos/${REPO}/contents/${path}`;
+
+        try {
+            const response = await fetch(url, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `token ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    message: `Add live: ${title}`,
+                    content: btoa(unescape(encodeURIComponent(yamlContent))) // Base64エンコード
+                })
+            });
+
+            if (response.ok) {
+                status.style.color = "green";
+                status.innerText = "✅ 保存完了！数分後にHPに反映されます。";
+                // 入力欄をクリア
+                document.querySelectorAll('input:not([type=password])').forEach(i => i.value = "");
+            } else {
+                const err = await response.json();
+                status.style.color = "red";
+                status.innerText = "❌ エラー: " + err.message;
+            }
+        } catch (e) {
+            status.innerText = "❌ 接続失敗: " + e.message;
+        }
+    }
+
+    // 読み込み時に保存されたトークンを呼び出す
+    window.onload = () => {
+        const savedToken = localStorage.getItem('gh_token_shino');
+        if (savedToken) document.getElementById('gh-token').value = savedToken;
+    };
+</script>
+</body>
+</html>

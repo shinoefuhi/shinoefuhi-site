@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>shinoefuhi Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<header>
+  <h1>Site Admin</h1>
+</header>
+
+<main>
+<section>
+  <h2>Live Editor</h2>
+
+  <div class="form">
+    <input id="live-date" type="date">
+    <input id="live-title" placeholder="タイトル">
+    <input id="live-place" placeholder="会場">
+    <input id="live-ticket" placeholder="チケットURL">
+    <button onclick="addLive()">追加</button>
+  </div>
+
+  <h3>Preview</h3>
+  <div id="live-preview"></div>
+
+  <h3>YAML</h3>
+  <textarea id="live-yaml" readonly></textarea>
+  <button onclick="copy('live-yaml')">コピー</button>
+</section>
+</main>
+
+<script src="admin.js"></script>
+</body>
+</html>

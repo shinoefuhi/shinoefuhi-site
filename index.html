@@ -13,124 +13,138 @@
         body { margin: 0; background-color: var(--bg-color); color: var(--main-text); font-family: 'Noto Serif JP', serif; line-height: 1.8; opacity: 0; animation: pageFadeIn 1.5s ease-out forwards; }
         @keyframes pageFadeIn { to { opacity: 1; } }
         a { text-decoration: none; color: inherit; transition: 0.3s; }
-        header { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: linear-gradient(rgba(248,250,253,0.8), rgba(248,250,253,0.8)), url('artist-photo.jpg') center/cover; }
-        h1 { font-family: 'Montserrat', sans-serif; font-size: 3rem; letter-spacing: 0.5rem; margin-bottom: 1rem; font-weight: 300; }
-        section { padding: 100px 10%; max-width: 1200px; margin: 0 auto; text-align: center; }
-        h2 { font-family: 'Montserrat', sans-serif; font-size: 2rem; letter-spacing: 0.3rem; margin-bottom: 50px; position: relative; display: inline-block; }
-        h2::after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 30px; height: 1px; background: var(--main-text); }
         
-        /* ライブ情報のリスト用スタイル */
-        .live-item { margin-bottom: 40px; text-align: left; padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
-        .live-date { font-family: 'Montserrat', sans-serif; font-size: 1.2rem; color: var(--sub-text); margin-right: 30px; }
-        .live-info { flex-grow: 1; }
-        .live-title { font-weight: 600; font-size: 1.1rem; }
-        .ticket-btn { padding: 5px 20px; border: 1px solid var(--main-text); font-size: 0.8rem; letter-spacing: 0.1rem; }
-        .ticket-btn:hover { background: var(--main-text); color: #fff; }
+        /* ヘッダー・ヒーローエリア */
+        header { height: 100vh; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('artist-photo.jpg') center/cover no-repeat; filter: brightness(0.8); z-index: -1; transform: scale(1.05); }
+        .hero-content { text-align: center; color: white; z-index: 1; }
+        .main-emblem { width: 280px; height: auto; margin-bottom: 20px; filter: drop-shadow(0 0 15px rgba(255,255,255,0.3)); animation: float 6s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        h1 { font-family: 'Montserrat', sans-serif; font-size: 3rem; letter-spacing: 0.5rem; margin: 0; font-weight: 300; }
 
-        /* 作品情報（Discography）用スタイル */
-        .disc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; margin-top: 50px; }
-        .disc-item { background: #fff; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .disc-item img { width: 100%; aspect-ratio: 1/1; object-fit: cover; margin-bottom: 15px; }
-        .streaming-links { font-size: 1.4rem; display: flex; justify-content: center; gap: 20px; margin: 15px 0; }
-        .streaming-links a:hover { color: var(--sub-text); }
-        .cd-details { font-size: 0.85rem; text-align: left; border-top: 1px solid #eee; padding-top: 15px; margin-top: 15px; }
+        nav { position: sticky; top: 0; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); padding: 20px; display: flex; justify-content: center; gap: 40px; z-index: 100; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; letter-spacing: 0.1rem; }
+        nav a:hover { color: #70a1ff; }
+
+        section { padding: 120px 20px; max-width: 1000px; margin: auto; }
+        h2 { text-align: center; font-family: 'Montserrat', sans-serif; font-weight: 300; font-size: 2rem; margin-bottom: 60px; letter-spacing: 0.3rem; }
+        
+        /* ライブリスト */
+        .live-item { background: white; padding: 25px; margin-bottom: 20px; border-radius: 4px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); display: flex; flex-wrap: wrap; align-items: center; gap: 20px; border-left: 4px solid var(--accent-yellow); transition: transform 0.3s; }
+        .live-item:hover { transform: translateX(10px); }
+        .live-date { font-family: 'Montserrat', sans-serif; font-weight: bold; font-size: 1.2rem; min-width: 140px; }
+        .live-info { flex: 1; }
+        .live-title { font-weight: bold; font-size: 1.1rem; margin-bottom: 5px; display: block;}
+        .live-place { font-size: 0.9rem; color: var(--sub-text); }
+        .btn { padding: 8px 20px; border-radius: 30px; font-size: 0.8rem; font-family: 'Montserrat', sans-serif; border: 1px solid var(--main-text); cursor: pointer; background: transparent; display: inline-block; }
+        .btn:hover { background: var(--main-text); color: white; }
+
+        /* Discography */
+        .disc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
+        .disc-item { background: white; padding: 20px; border-radius: 4px; box-shadow: 10px 10px 0px rgba(253, 253, 150, 0.4); text-align: center; }
+        .disc-item img { width: 100%; aspect-ratio:1/1; object-fit: cover; margin-bottom: 20px; }
+        .social-links { margin-top: 15px; font-size: 1.5rem; display: flex; justify-content: center; gap: 20px; }
+
+        footer { text-align: center; padding: 60px; font-size: 0.8rem; color: var(--sub-text); }
+        @media (max-width: 768px) { h1 { font-size: 2rem; } .main-emblem { width: 200px; } .live-item { flex-direction: column; align-items: flex-start; } }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>shinoefuhi</h1>
-    <nav>
-        <a href="#live">LIVE</a> / <a href="#discography">DISCOGRAPHY</a> / <a href="#contact">CONTACT</a>
-    </nav>
+    <div class="hero-bg" id="hero-bg"></div>
+    <div class="hero-content">
+        <img src="emblem.png" alt="shinoefuhi emblem" class="main-emblem">
+        <h1>shinoefuhi</h1>
+    </div>
 </header>
 
-<section id="live">
-    <h2>LIVE</h2>
-    <div id="live-list">読み込み中...</div>
+<nav>
+    <a href="#news">NEWS/LIVE</a>
+    <a href="#discography">DISCOGRAPHY</a>
+    <a href="#contact">CONTACT</a>
+</nav>
+
+<section id="news">
+    <h2>NEWS / LIVE</h2>
+    <div id="live-list"><p style="text-align:center;">Loading...</p></div>
 </section>
 
 <section id="discography">
     <h2>DISCOGRAPHY</h2>
-    <div id="disc-list" class="disc-grid">読み込み中...</div>
+    <div id="disc-list" class="disc-grid"></div>
 </section>
 
+<section id="contact">
+    <h2>SNS / CONTACT</h2>
+    <div style="text-align: center; font-size: 2rem; display: flex; justify-content: center; gap: 40px; margin-bottom: 40px;">
+        <a href="https://www.youtube.com/@shinoefuhi" target="_blank"><i class="fab fa-youtube"></i></a>
+        <a href="https://x.com/" target="_blank"><i class="fab fa-x-twitter"></i></a>
+        <a href="https://www.instagram.com/" target="_blank"><i class="fab fa-instagram"></i></a>
+    </div>
+    <p style="text-align: center;">info@shinoefuhi.com</p>
+</section>
+
+<footer>&copy; 2026 shinoefuhi.</footer>
+
 <script>
-<script>
-    // 1. LIVE情報の取得（ダッシュボードで入力したデータを読み込む）
-    const liveList = document.getElementById('live-list');
-    fetch('https://api.github.com/repos/shinoefuhi/shinoefuhi-site/contents/_data/lives')
-        .then(res => res.json())
-        .then(files => {
-            liveList.innerHTML = ''; 
-            const today = new Date().toISOString().split('T')[0];
+    const REPO = "shinoefuhi/shinoefuhi-site";
 
-            files.forEach(file => {
-                fetch(file.download_url).then(r => r.text()).then(yaml => {
-                    const date = yaml.match(/date: "(.+)"/)?.[1] || "";
-                    const title = yamlText.match(/title: "(.+)"/)?.[1] || "";
-                    const place = yaml.match(/place: "(.+)"/)?.[1] || "";
-                    const time = yaml.match(/time: "(.+)"/)?.[1] || "";
-                    const flyer = yaml.match(/flyer: "(.+)"/)?.[1] || "";
-                    const url = yaml.match(/ticketUrl: "(.+)"/)?.[1] || "";
-
-                    if (date >= today) {
-                        liveList.innerHTML += `
-                            <div class="live-item">
-                                <div class="live-date">${date.replace(/-/g, '.')} <br><span style="font-size:0.8em; font-weight:normal;">${time}</span></div>
-                                <div class="live-info">
-                                    <span class="live-title">${title}</span>
-                                    <span class="live-place">@ ${place}</span>
-                                </div>
-                                <div class="live-actions">
-                                    ${flyer ? `<button class="btn btn-flyer" onclick="openModal('${flyer}')">FLYER</button>` : ''}
-                                    ${url ? `<a href="${url}" target="_blank" class="btn">TICKET</a>` : ''}
-                                </div>
-                            </div>`;
-                    }
-                });
-            });
-        }).catch(() => { liveList.innerHTML = '<p>現在、ライブの予定はありません。</p>'; });
-
-    // 2. DISCOGRAPHYの取得（ダッシュボードで入力したデータを読み込む）
-    const discGrid = document.querySelector('.disc-grid');
-    fetch('https://api.github.com/repos/shinoefuhi/shinoefuhi-site/contents/_data/discography')
-        .then(res => res.json())
-        .then(files => {
-            discGrid.innerHTML = '';
-            files.forEach(file => {
-                fetch(file.download_url).then(r => r.text()).then(yaml => {
-                    const title = yaml.match(/title: "(.+)"/)?.[1] || "";
-                    const img = yaml.match(/image: "(.+)"/)?.[1] || "";
-                    const type = yaml.match(/type: "(.+)"/)?.[1] || "";
-                    const apple = yaml.match(/appleMusic: "(.+)"/)?.[1] || "";
-
-                    discGrid.innerHTML += `
-                        <div class="disc-item">
-                            <img src="${img}" alt="${title}">
-                            <h3>${title}</h3>
-                            <p style="font-size: 0.9rem; color: var(--sub-text);">${type}</p>
-                            <div style="margin-top: 15px;">
-                                ${apple ? `<a href="${apple}" target="_blank" class="btn">LISTEN</a>` : ''}
-                            </div>
-                        </div>`;
-                });
+    // 1. ライブ情報の取得
+    fetch(`https://api.github.com/repos/${REPO}/contents/_data/lives`)
+    .then(res => res.json())
+    .then(files => {
+        const list = document.getElementById('live-list');
+        list.innerHTML = '';
+        files.forEach(file => {
+            fetch(file.download_url).then(r => r.text()).then(yaml => {
+                const date = yaml.match(/date: "(.+)"/)?.[1] || "";
+                const title = yaml.match(/title: "(.+)"/)?.[1] || "";
+                const place = yaml.match(/place: "(.+)"/)?.[1] || "";
+                const url = yaml.match(/ticketUrl: "(.+)"/)?.[1] || "";
+                list.innerHTML += `
+                    <div class="live-item">
+                        <div class="live-date">${date.replace(/-/g, '.')}</div>
+                        <div class="live-info">
+                            <span class="live-title">${title}</span>
+                            <span class="live-place">@ ${place}</span>
+                        </div>
+                        ${url ? `<a href="${url}" target="_blank" class="btn">TICKET</a>` : ''}
+                    </div>`;
             });
         });
+    }).catch(() => { document.getElementById('live-list').innerHTML = '<p style="text-align:center;">現在予定されているライブはありません。</p>'; });
 
-    // モーダル・パララックス制御
-    function openModal(imgSrc) {
-        document.getElementById('modalImg').src = imgSrc;
-        document.getElementById('flyerModal').style.display = "flex";
-    }
-    function closeModal() { document.getElementById('flyerModal').style.display = "none"; }
-    window.onclick = function(e) { if (e.target == document.getElementById('flyerModal')) closeModal(); }
+    // 2. 作品情報の取得
+    fetch(`https://api.github.com/repos/${REPO}/contents/_data/discography`)
+    .then(res => res.json())
+    .then(files => {
+        const list = document.getElementById('disc-list');
+        files.forEach(file => {
+            fetch(file.download_url).then(r => r.text()).then(yaml => {
+                const title = yaml.match(/title: "(.+)"/)?.[1] || "";
+                const img = yaml.match(/image: "(.+)"/)?.[1] || "";
+                const yt = yaml.match(/youtube: "(.+)"/)?.[1] || "";
+                const apple = yaml.match(/appleMusic: "(.+)"/)?.[1] || "";
+                const spotify = yaml.match(/spotify: "(.+)"/)?.[1] || "";
+                list.innerHTML += `
+                    <div class="disc-item">
+                        <img src="${img}" alt="${title}">
+                        <h3>${title}</h3>
+                        <div class="social-links">
+                            ${yt ? `<a href="${yt}" target="_blank"><i class="fab fa-youtube"></i></a>` : ''}
+                            ${apple ? `<a href="${apple}" target="_blank"><i class="fab fa-apple"></i></a>` : ''}
+                            ${spotify ? `<a href="${spotify}" target="_blank"><i class="fab fa-spotify"></i></a>` : ''}
+                        </div>
+                    </div>`;
+            });
+        });
+    });
+
+    // パララックス効果
     window.addEventListener('scroll', () => {
         const bg = document.getElementById('hero-bg');
         if(bg) bg.style.transform = `translateY(${window.pageYOffset * 0.4}px) scale(1.05)`;
     });
 </script>
-</script>
-
 </body>
 </html>

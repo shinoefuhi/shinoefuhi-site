@@ -13,7 +13,12 @@ collections:
     create: true
     slug: "{{year}}-{{month}}-{{day}}-{{title}}"
     fields:
-      - {label: "公演日", name: "date", widget: "date"}
+      - label: "公演日"
+        name: "date"
+        widget: "datetime"
+        format: "YYYY-MM-DD"
+        date_format: "YYYY-MM-DD"
+        time_format: false
       - {label: "時間", name: "time", widget: "string", default: "18:00 START"}
       - {label: "タイトル", name: "title", widget: "string"}
       - {label: "会場", name: "place", widget: "string"}

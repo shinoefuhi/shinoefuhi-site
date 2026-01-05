@@ -19,11 +19,36 @@ collections:
         format: "YYYY-MM-DD"
         date_format: "YYYY-MM-DD"
         time_format: false
-      - {label: "時間", name: "time", widget: "string", default: "18:00 START"}
+        
+     - label: "OPEN時間"
+        name: "open_time"
+        widget: "string"
+        hint: "例：18:30"
+        required: false
+
+      - label: "START時間"
+        name: "start_time"
+        widget: "string"
+        hint: "例：19:00"
+        required: false
+
+      - label: "チケット料金"
+        name: "price"
+        widget: "string"
+        hint: "前売 ¥3,000 / 当日 ¥3,500 (+1D)"
+        required: false
+        
       - {label: "タイトル", name: "title", widget: "string"}
       - {label: "会場", name: "place", widget: "string"}
+      
+      - name: "artists"
+        label: "共演"
+        widget: "string"
+        required: false
+        
       - {label: "チケットURL", name: "ticketUrl", widget: "string", required: false}
       - {label: "フライヤー画像", name: "flyer", widget: "image", required: false}
+  
 
   - name: "discography"
     label: "作品情報"

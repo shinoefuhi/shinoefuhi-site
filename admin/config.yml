@@ -1,5 +1,5 @@
 backend:
-  name: github
+  name: git-gateway
   repo: shinoefuhi/shinoefuhi-site # ご自身のリポジトリ名に合わせてください
   branch: main
 

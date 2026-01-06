@@ -254,7 +254,7 @@ async function loadLives() {
                 const el = document.createElement("div");
                 el.className = "live-item";
                 el.innerHTML = `
-                    <div class="live-date">${l.date.replace(/-/g, '.')}</div>
+                    <div class="live-date">${String(l.date).replace(/-/g, '.')}</div>
                     <div class="live-info">
                         <strong>${l.title}</strong><br>
                         <span style="color:#777">@ ${l.place}</span><br>

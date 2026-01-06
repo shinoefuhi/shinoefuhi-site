@@ -208,13 +208,15 @@ nav {
     position: sticky;
     top: 0;
     z-index: 1000;
-    /* ガラスのような透明感とぼかし */
-    background: rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+
+    /* グラスモフィズム：背景を少し透過させ、背後をぼかす */
+    /* 背景色を rgba(255, 255, 255, 0.4) くらいまで下げると透け感が強まります */
+    background: rgba(255, 255, 255, 0.5); 
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     
-    /* 左右のフェード（消えゆく余韻：有機的な境界線） */
+    /* 左右のフェードアウト：15%の範囲でじわっと消える設定 */
     mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
     -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
     
@@ -234,52 +236,32 @@ nav ul {
     white-space: nowrap;
 }
 
-nav ul li {
-    margin: 0 18px;
+/* スマホ用の微調整（ここを大幅に変更しました） */
+@media (max-width: 600px) {
+    nav ul {
+        justify-content: flex-start;
+        /* 左側に大きな余白(80px)、右側にもフェードアウト用の余白(80px)を確保 */
+        padding: 18px 80px 18px 80px; 
+    }
+    
+    /* 最後の項目の右側に透明なスペースを追加して、右側のフェードアウトを見えやすくする */
+    nav ul::after {
+        content: "";
+        padding-right: 1px;
+    }
+
+    nav ul li {
+        margin: 0 15px; /* 項目の間隔を少しゆったりさせる */
+    }
 }
 
 nav ul li a {
     text-decoration: none;
     color: #1a1a1a;
-    font-size: 13px;
-    letter-spacing: 0.2em; /* 文字間隔を広げて先鋭的な印象に */
-    text-transform: uppercase;
+    font-size: 14px;
+    letter-spacing: 0.15em;
     font-weight: 300;
     transition: color 0.4s ease;
-    position: relative;
-    display: inline-block;
-}
-
-/* ホバー時の装飾：鋭く伸びる光のライン */
-nav ul li a::after {
-    content: '';
-    position: absolute;
-    bottom: -6px;
-    left: 50%;
-    width: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, #000, transparent);
-    transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-    transform: translateX(-50%);
-    opacity: 0;
-}
-
-nav ul li a:hover {
-    color: #999;
-}
-
-nav ul li a:hover::after {
-    width: 140%;
-    opacity: 1;
-}
-
-/* スマホ用の微調整 */
-@media (max-width: 600px) {
-    nav ul {
-        justify-content: flex-start;
-        /* 左に40pxの余白を持たせ、開始位置に呼吸をさせる */
-        padding: 18px 40px; 
-    }
 }
 
 /* --- 中略（既存のコードがある場所） --- */

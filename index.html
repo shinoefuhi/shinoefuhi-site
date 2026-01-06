@@ -187,86 +187,82 @@ html, body {
         display: block;
     }
 }
-
-/* --- ナビゲーション統合・進化版（グラスモフィズム＆有機的スライド） --- */
+/* --- ナビゲーション最終進化版（HTML構造に最適化） --- */
 nav {
     width: 100%;
     position: sticky;
     top: 0;
     z-index: 1000;
     
-    /* 1. グラスモフィズム（透け感を強めるために0.3まで下げました） */
-    background: rgba(255, 255, 255, 0.3); 
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+    /* 1. グラスモフィズム（透過とぼかし） */
+    background: rgba(255, 255, 255, 0.4); 
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     
-    /* 2. 左右のフェード（中心を広めに確保） */
-    mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
-    -webkit-mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
-    
+    /* 2. 横スクロールの設定 */
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    display: block; /* flexからblockに変更（スライドを安定させるため） */
+    white-space: nowrap; /* 改行を防いで横一列に */
+    display: flex; /* 項目を横に並べる */
+    align-items: center;
+    justify-content: center; /* PCでは中央寄せ */
 }
 
-/* スクロールバーを完全に隠す */
+/* スクロールバーを隠す */
 nav::-webkit-scrollbar { display: none; }
 
-nav ul {
-    display: inline-flex; /* 項目に合わせて横に伸びるように設定 */
-    justify-content: center;
-    min-width: 100%; /* PCでは中央寄せを維持 */
-    padding: 20px 0;
-    margin: 0;
-    list-style: none;
-    white-space: nowrap;
-}
-
-nav ul li {
-    margin: 0 20px;
-}
-
-nav ul li a {
+/* 3. メニュー項目（aタグ）の装飾 */
+nav a {
+    display: inline-block;
+    padding: 20px 25px;
     text-decoration: none;
     color: #1a1a1a;
     font-size: 13px;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.25em; /* 先鋭的な広い文字間隔 */
     font-weight: 300;
     font-family: 'Montserrat', sans-serif;
     transition: all 0.4s ease;
+    position: relative;
 }
 
-/* スマホ用の「先鋭的・有機的」な余白調整 */
+/* 4. スマホ用の調整（余裕とフェード） */
 @media (max-width: 600px) {
-    nav ul {
-        justify-content: flex-start; /* スライドのために左寄せ */
-        /* 左側に100px、右側に100pxの巨大なバッファ（余裕）を作る */
-        padding: 20px 100px; 
+    nav {
+        justify-content: flex-start; /* 左からスライドさせる */
+        /* 左右に大きなフェードアウト効果 */
+        mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+        -webkit-mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
     }
     
-    /* 右端でしっかりフェードアウトさせるためのダミー要素 */
-    nav ul::after {
-        content: "";
-        min-width: 100px;
-        display: block;
+    /* 左端のLIVEの前に大きな余白を作る */
+    nav a:first-child {
+        margin-left: 80px;
+    }
+    
+    /* 右端のCONTACTの後に大きな余白を作る（これで右側のフェードが綺麗に見えます） */
+    nav a:last-child {
+        margin-right: 80px;
     }
 }
 
-/* ホバー装飾：鋭い光のライン */
-nav ul li a::after {
+/* ホバー時の有機的な光のライン */
+nav a::after {
     content: '';
     position: absolute;
-    bottom: -6px;
+    bottom: 15px;
     left: 50%;
     width: 0;
     height: 1px;
     background: linear-gradient(90deg, transparent, #000, transparent);
     transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
     transform: translateX(-50%);
+    opacity: 0;
 }
-nav ul li a:hover::after { width: 140%; }
-
+nav a:hover::after {
+    width: 80%;
+    opacity: 1;
+}
 /* --- 中略（既存のコードがある場所） --- */
 </style>
 </head>

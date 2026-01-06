@@ -1,14 +1,48 @@
-<script>
-async function loadArchive(){
- const list=document.getElementById("archive-list");
- const lives=await fetch("/data/lives.json").then(r=>r.json());
- const today=new Date().setHours(0,0,0,0);
+<script src="https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js"></script>
 
- lives
-  .filter(l=>new Date(l.date)<today)
-  .forEach(l=>{
-    list.innerHTML+=`<p>${l.date} / ${l.title} @ ${l.place}</p>`;
-  });
+<script>
+const REPO = "shinoefuhi/shinoefuhi-site";
+
+async function loadArchive() {
+    const list = document.getElementById("archive-list"); // archive.html内のIDに合わせてください
+    try {
+        const res = await fetch(`https://api.github.com/repos/${REPO}/contents/_data/lives`);
+        const files = await res.json();
+
+        const livePromises = files.filter(f => f.name.endsWith('.yml')).map(async (file) => {
+            const contentRes = await fetch(file.download_url);
+            const yamlText = await contentRes.text();
+            return jsyaml.load(yamlText);
+        });
+
+        const lives = await Promise.all(livePromises);
+        
+        // 過去のライブだけを抽出し、新しい順に並べる
+        const today = new Date().setHours(0, 0, 0, 0);
+        const past = lives.filter(l => new Date(l.date) < today)
+                          .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        if (!past.length) {
+            list.innerHTML = "<p>過去のライブ情報はありません。</p>";
+            return;
+        }
+
+        list.innerHTML = "";
+        past.forEach(l => {
+            const el = document.createElement("div");
+            el.className = "live-item"; // index.htmlと同じスタイルを使う場合
+            el.innerHTML = `
+                <div class="live-date">${l.date.replace(/-/g, '.')}</div>
+                <div class="live-info">
+                    <strong>${l.title}</strong><br>
+                    <span>@ ${l.place}</span>
+                </div>
+            `;
+            list.appendChild(el);
+        });
+    } catch (e) {
+        list.innerHTML = "<p>読み込みに失敗しました。</p>";
+    }
 }
 loadArchive();
 </script>

@@ -2,202 +2,197 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>ライブ情報管理（修正・削除機能付き）</title>
+    <title>shinoefuhi 統合管理画面</title>
     <style>
-        body { font-family: sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; line-height: 1.6; background: #f4f7f6; }
-        .box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        h2 { border-bottom: 2px solid #2c3e50; padding-bottom: 10px; color: #2c3e50; }
-        label { display: block; margin-top: 15px; font-weight: bold; }
-        input, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-        button { background: #2c3e50; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; margin-top: 20px; width: 100%; font-size: 16px; }
+        body { font-family: sans-serif; max-width: 900px; margin: 20px auto; padding: 20px; background: #f4f7f6; color: #2c3e50; }
+        .box { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        h2 { border-left: 5px solid #2c3e50; padding-left: 15px; margin-bottom: 20px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        label { display: block; margin-top: 10px; font-weight: bold; font-size: 0.9em; }
+        input, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button { background: #2c3e50; color: white; border: none; padding: 15px; border-radius: 6px; cursor: pointer; margin-top: 20px; width: 100%; font-size: 16px; font-weight: bold; }
         button:hover { background: #34495e; }
-        .delete-btn { background: #e74c3c; width: auto; padding: 5px 10px; font-size: 12px; margin-top: 0; }
-        .delete-btn:hover { background: #c0392b; }
+        .delete-btn { background: #e74c3c; width: auto; padding: 5px 12px; font-size: 12px; margin-top: 0; }
         .live-item { border-bottom: 1px solid #eee; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
-        .edit-link { color: #3498db; cursor: pointer; text-decoration: underline; }
-        #status { margin-top: 20px; padding: 10px; border-radius: 4px; display: none; }
+        .edit-link { color: #3498db; cursor: pointer; text-decoration: underline; font-size: 0.9em; }
+        #status { position: fixed; top: 20px; right: 20px; padding: 15px 25px; border-radius: 8px; color: white; display: none; z-index: 1000; }
+        .type-badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; color: white; margin-right: 8px; }
     </style>
 </head>
 <body>
 
-    <h1>ライブ情報管理</h1>
+    <h1>shinoefuhi 統合管理システム</h1>
 
     <div class="box">
-        <h2>1. 認証設定</h2>
-        <label>GitHubトークン (ghp_...)</label>
-        <input type="password" id="token" placeholder="一度入力すると保存されます">
+        <h2>1. 認証</h2>
+        <input type="password" id="token" placeholder="GitHubトークン (ghp_...)">
     </div>
 
     <div class="box">
-        <h2 id="form-title">2. ライブ情報の新規登録 / 修正</h2>
-        <input type="hidden" id="edit-sha"> <label>日付 (例: 2026-01-06)</label>
-        <input type="date" id="date">
-
-        <label>ライブタイトル</label>
-        <input type="text" id="title" placeholder="イベント名">
-
-        <label>会場</label>
-        <input type="text" id="place" placeholder="ライブハウス名">
-
-        <label>チケットURL (任意)</label>
-        <input type="url" id="ticketUrl" placeholder="https://...">
-
-        <button onclick="saveLive()">GitHubへ保存（新規・上書き）</button>
-        <button onclick="resetForm()" style="background:#95a5a6; margin-top:10px;">入力をクリア（新規登録に戻る）</button>
+        <h2 id="live-form-title">2. ライブ情報の登録/修正</h2>
+        <input type="hidden" id="live-sha">
+        <div class="grid">
+            <div><label>日付</label><input type="date" id="live-date"></div>
+            <div><label>タイトル</label><input type="text" id="live-title"></div>
+        </div>
+        <div class="grid">
+            <div><label>会場</label><input type="text" id="live-place"></div>
+            <div><label>料金 (例: ¥3,000 +1D)</label><input type="text" id="live-price"></div>
+        </div>
+        <div class="grid">
+            <div><label>OPEN時間</label><input type="time" id="live-open"></div>
+            <div><label>START時間</label><input type="time" id="live-start"></div>
+        </div>
+        <div class="grid">
+            <div><label>チケットURL</label><input type="url" id="live-ticket" placeholder="https://..."></div>
+            <div><label>Twitter/X 告知URL</label><input type="url" id="live-twitter" placeholder="https://x.com/..."></div>
+        </div>
+        <button onclick="saveItem('live')">ライブ情報を保存</button>
+        <button onclick="resetForm('live')" style="background:#95a5a6; margin-top:10px;">入力をクリア</button>
     </div>
 
     <div class="box">
-        <h2>3. 登録済みライブ一覧（修正・削除）</h2>
-        <div id="live-list">読み込み中...</div>
+        <h2 id="disc-form-title">3. Discographyの登録/修正</h2>
+        <input type="hidden" id="disc-sha">
+        <label>作品タイトル</label><input type="text" id="disc-title">
+        <label>画像URL (GitHubに上げた写真のURL)</label><input type="text" id="disc-image">
+        <div class="grid">
+            <div><label>YouTube URL</label><input type="url" id="disc-youtube"></div>
+            <div><label>Spotify URL</label><input type="url" id="disc-spotify"></div>
+        </div>
+        <button onclick="saveItem('disc')" style="background:#27ae60;">作品情報を保存</button>
+        <button onclick="resetForm('disc')" style="background:#95a5a6; margin-top:10px;">入力をクリア</button>
+    </div>
+
+    <div class="box">
+        <h2>4. 登録済みデータ一覧</h2>
+        <div id="data-list">読み込み中...</div>
     </div>
 
     <div id="status"></div>
 
     <script>
-        const REPO = "shinoefuhi/shinoefuhi-site"; // あなたのリポジトリ
+        const REPO = "shinoefuhi/shinoefuhi-site";
         const tokenInput = document.getElementById('token');
 
-        // ページ読み込み時にトークンを復元し、一覧を表示
         window.onload = () => {
             const savedToken = localStorage.getItem('gh_token');
-            if (savedToken) tokenInput.value = savedToken;
-            loadLiveList();
+            if (savedToken) { tokenInput.value = savedToken; loadAllList(); }
         };
 
-        // 一覧を読み込む
-        async function loadLiveList() {
-            const listDiv = document.getElementById('live-list');
+        async function loadAllList() {
+            const listDiv = document.getElementById('data-list');
             const token = tokenInput.value;
-            if (!token) {
-                listDiv.innerHTML = "トークンを入力すると一覧が表示されます。";
-                return;
-            }
+            if (!token) { listDiv.innerHTML = "トークンを入力してください。"; return; }
 
             try {
-                const res = await fetch(`https://api.github.com/repos/${REPO}/contents/_data/lives`, {
-                    headers: { 'Authorization': `token ${token}` }
-                });
-                if (!res.ok) throw new Error();
-                const files = await res.json();
-
-                listDiv.innerHTML = "";
-                files.forEach(file => {
-                    const item = document.createElement('div');
-                    item.className = 'live-item';
-                    item.innerHTML = `
-                        <span>${file.name}</span>
-                        <div>
-                            <span class="edit-link" onclick="prepareEdit('${file.path}', '${file.sha}')">修正</span> | 
-                            <button class="delete-btn" onclick="deleteLive('${file.path}', '${file.sha}')">削除</button>
-                        </div>
-                    `;
-                    listDiv.appendChild(item);
-                });
-            } catch (e) {
-                listDiv.innerHTML = "データの取得に失敗しました。トークンやリポジトリ名を確認してください。";
-            }
+                const liveRes = await fetch(`https://api.github.com/repos/${REPO}/contents/_data/lives`, { headers: { 'Authorization': `token ${token}` } });
+                const discRes = await fetch(`https://api.github.com/repos/${REPO}/contents/_data/discography`, { headers: { 'Authorization': `token ${token}` } });
+                
+                let html = "";
+                if(liveRes.ok) {
+                    const lives = await liveRes.json();
+                    lives.forEach(f => html += createListItem(f, 'live', '#3498db'));
+                }
+                if(discRes.ok) {
+                    const discs = await discRes.json();
+                    discs.forEach(f => html += createListItem(f, 'disc', '#27ae60'));
+                }
+                listDiv.innerHTML = html || "データがありません。";
+            } catch (e) { listDiv.innerHTML = "取得エラー"; }
         }
 
-        // 修正の準備
-        async function prepareEdit(path, sha) {
+        function createListItem(f, type, color) {
+            const typeName = type === 'live' ? 'LIVE' : 'DISC';
+            return `<div class="live-item">
+                <span><span class="type-badge" style="background:${color}">${typeName}</span> ${f.name}</span>
+                <div>
+                    <span class="edit-link" onclick="prepareEdit('${f.path}', '${f.sha}', '${type}')">修正</span> | 
+                    <button class="delete-btn" onclick="deleteItem('${f.path}', '${f.sha}')">削除</button>
+                </div>
+            </div>`;
+        }
+
+        async function prepareEdit(path, sha, type) {
             const token = tokenInput.value;
-            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
-                headers: { 'Authorization': `token ${token}` }
-            });
+            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, { headers: { 'Authorization': `token ${token}` } });
             const data = await res.json();
             const content = decodeURIComponent(escape(atob(data.content)));
-            
-            // 簡易的な解析（YAMLを自前でパース）
-            const lines = content.split('\n');
             const info = {};
-            lines.forEach(line => {
-                const [key, ...val] = line.split(':');
-                if (key) info[key.trim()] = val.join(':').trim();
+            content.split('\n').forEach(line => {
+                const [k, ...v] = line.split(':');
+                if (k) info[k.trim()] = v.join(':').trim();
             });
 
-            document.getElementById('date').value = info.date || "";
-            document.getElementById('title').value = info.title || "";
-            document.getElementById('place').value = info.place || "";
-            document.getElementById('ticketUrl').value = info.ticketUrl || "";
-            document.getElementById('edit-sha').value = sha;
-            document.getElementById('form-title').innerText = "2. ライブ情報の修正（上書きモード）";
-            window.scrollTo(0, 0);
+            if (type === 'live') {
+                document.getElementById('live-date').value = info.date;
+                document.getElementById('live-title').value = info.title;
+                document.getElementById('live-place').value = info.place;
+                document.getElementById('live-price').value = info.price || "";
+                document.getElementById('live-open').value = info.open_time || "";
+                document.getElementById('live-start').value = info.start_time || "";
+                document.getElementById('live-ticket').value = info.ticketUrl || "";
+                document.getElementById('live-twitter').value = info.twitterUrl || "";
+                document.getElementById('live-sha').value = sha;
+                document.getElementById('live-form-title').innerText = "修正モード中";
+            } else {
+                document.getElementById('disc-title').value = info.title;
+                document.getElementById('disc-image').value = info.image;
+                document.getElementById('disc-youtube').value = info.youtube || "";
+                document.getElementById('disc-spotify').value = info.spotify || "";
+                document.getElementById('disc-sha').value = sha;
+                document.getElementById('disc-form-title').innerText = "修正モード中";
+            }
+            window.scrollTo(0,0);
         }
 
-        // 保存（新規・上書き）
-        async function saveLive() {
+        async function saveItem(type) {
             const token = tokenInput.value;
-            const date = document.getElementById('date').value;
-            const title = document.getElementById('title').value;
-            const place = document.getElementById('place').value;
-            const ticketUrl = document.getElementById('ticketUrl').value;
-            const sha = document.getElementById('edit-sha').value;
-
-            if (!token || !date || !title) {
-                alert("トークン、日付、タイトルは必須です。");
-                return;
-            }
-
             localStorage.setItem('gh_token', token);
+            let path, yaml, sha, fileName;
 
-            const fileName = `${date}-${title.replace(/\s+/g, '-')}.yml`;
-            const path = `_data/lives/${fileName}`;
-            const yamlContent = `date: ${date}\ntitle: ${title}\nplace: ${place}\nticketUrl: ${ticketUrl}`;
-            const base64Content = btoa(unescape(encodeURIComponent(yamlContent)));
-
-            const body = {
-                message: `Update live: ${fileName}`,
-                content: base64Content
-            };
-            if (sha) body.sha = sha; // 修正時はshaを付与
+            if (type === 'live') {
+                const d = document.getElementById('live-date').value;
+                const t = document.getElementById('live-title').value;
+                fileName = `${d}-${t.replace(/\s+/g, '-')}.yml`;
+                path = `_data/lives/${fileName}`;
+                sha = document.getElementById('live-sha').value;
+                yaml = `date: ${d}\ntitle: ${t}\nplace: ${document.getElementById('live-place').value}\nprice: ${document.getElementById('live-price').value}\nopen_time: ${document.getElementById('live-open').value}\nstart_time: ${document.getElementById('live-start').value}\nticketUrl: ${document.getElementById('live-ticket').value}\ntwitterUrl: ${document.getElementById('live-twitter').value}`;
+            } else {
+                const t = document.getElementById('disc-title').value;
+                fileName = `${t.replace(/\s+/g, '-')}.yml`;
+                path = `_data/discography/${fileName}`;
+                sha = document.getElementById('disc-sha').value;
+                yaml = `title: ${t}\nimage: ${document.getElementById('disc-image').value}\nyoutube: ${document.getElementById('disc-youtube').value}\nspotify: ${document.getElementById('disc-spotify').value}`;
+            }
 
             const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
                 method: 'PUT',
-                headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
+                headers: { 'Authorization': `token ${token}` },
+                body: JSON.stringify({ message: `Update ${type}`, content: btoa(unescape(encodeURIComponent(yaml))), sha: sha || undefined })
             });
 
-            if (res.ok) {
-                showStatus("保存に成功しました！反映まで数分お待ちください。", "green");
-                resetForm();
-                loadLiveList();
-            } else {
-                showStatus("エラーが発生しました。", "red");
-            }
+            if (res.ok) { alert("保存しました！"); resetForm(type); loadAllList(); }
         }
 
-        // 削除
-        async function deleteLive(path, sha) {
-            if (!confirm("本当にこのライブ情報を削除しますか？")) return;
-            const token = tokenInput.value;
-
-            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+        async function deleteItem(path, sha) {
+            if (!confirm("消去しますか？")) return;
+            await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
                 method: 'DELETE',
-                headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: "Delete live", sha: sha })
+                headers: { 'Authorization': `token ${tokenInput.value}` },
+                body: JSON.stringify({ message: "Delete", sha: sha })
             });
+            loadAllList();
+        }
 
-            if (res.ok) {
-                showStatus("削除しました。", "orange");
-                loadLiveList();
+        function resetForm(type) {
+            if(type==='live'){
+                document.querySelectorAll('.box:nth-of-type(2) input').forEach(i => i.value="");
+                document.getElementById('live-form-title').innerText = "2. ライブ情報の登録/修正";
+            } else {
+                document.querySelectorAll('.box:nth-of-type(3) input').forEach(i => i.value="");
+                document.getElementById('disc-form-title').innerText = "3. Discographyの登録/修正";
             }
-        }
-
-        function resetForm() {
-            document.getElementById('date').value = "";
-            document.getElementById('title').value = "";
-            document.getElementById('place').value = "";
-            document.getElementById('ticketUrl').value = "";
-            document.getElementById('edit-sha').value = "";
-            document.getElementById('form-title').innerText = "2. ライブ情報の新規登録 / 修正";
-        }
-
-        function showStatus(msg, color) {
-            const s = document.getElementById('status');
-            s.innerText = msg;
-            s.style.display = "block";
-            s.style.backgroundColor = color === "green" ? "#dff0d8" : "#f2dede";
-            setTimeout(() => s.style.display = "none", 5000);
         }
     </script>
 </body>

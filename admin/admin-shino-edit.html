@@ -1,108 +1,204 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<title>shinoefuhi Admin (Direct)</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
-<style>
-    body { font-family: sans-serif; padding: 20px; background: #f4f7f9; color: #333; }
-    .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    h2 { border-bottom: 2px solid #ddd; padding-bottom: 10px; }
-    input, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box; }
-    button { background: #2c3e50; color: white; border: none; cursor: pointer; font-weight: bold; }
-    button:hover { background: #34495e; }
-    .token-section { background: #fff3cd; padding: 15px; border-radius: 4px; margin-bottom: 20px; font-size: 0.8rem; }
-    #status { font-weight: bold; text-align: center; margin-top: 15px; }
-</style>
+    <meta charset="UTF-8">
+    <title>ライブ情報管理（修正・削除機能付き）</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; line-height: 1.6; background: #f4f7f6; }
+        .box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h2 { border-bottom: 2px solid #2c3e50; padding-bottom: 10px; color: #2c3e50; }
+        label { display: block; margin-top: 15px; font-weight: bold; }
+        input, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { background: #2c3e50; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; margin-top: 20px; width: 100%; font-size: 16px; }
+        button:hover { background: #34495e; }
+        .delete-btn { background: #e74c3c; width: auto; padding: 5px 10px; font-size: 12px; margin-top: 0; }
+        .delete-btn:hover { background: #c0392b; }
+        .live-item { border-bottom: 1px solid #eee; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
+        .edit-link { color: #3498db; cursor: pointer; text-decoration: underline; }
+        #status { margin-top: 20px; padding: 10px; border-radius: 4px; display: none; }
+    </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Live Information Editor</h2>
-    
-    <div class="token-section">
-        <strong>【初期設定】</strong> GitHubのトークンを入力してください（ブラウザに保存されます）。
-        <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxx">
+    <h1>ライブ情報管理</h1>
+
+    <div class="box">
+        <h2>1. 認証設定</h2>
+        <label>GitHubトークン (ghp_...)</label>
+        <input type="password" id="token" placeholder="一度入力すると保存されます">
     </div>
 
-    <input id="live-date" type="date">
-    <input id="live-title" placeholder="ライブタイトル">
-    <input id="live-place" placeholder="会場名 (例: 渋谷WWW)">
-    <input id="live-open" placeholder="OPEN (例: 18:00)">
-    <input id="live-start" placeholder="START (例: 18:30)">
-    <input id="live-price" placeholder="料金 (例: ¥3,000)">
-    <input id="live-artists" placeholder="対バン/出演者">
-    <input id="live-url" placeholder="チケットURL">
+    <div class="box">
+        <h2 id="form-title">2. ライブ情報の新規登録 / 修正</h2>
+        <input type="hidden" id="edit-sha"> <label>日付 (例: 2026-01-06)</label>
+        <input type="date" id="date">
 
-    <button onclick="saveToGitHub()">GitHubへ保存する</button>
+        <label>ライブタイトル</label>
+        <input type="text" id="title" placeholder="イベント名">
+
+        <label>会場</label>
+        <input type="text" id="place" placeholder="ライブハウス名">
+
+        <label>チケットURL (任意)</label>
+        <input type="url" id="ticketUrl" placeholder="https://...">
+
+        <button onclick="saveLive()">GitHubへ保存（新規・上書き）</button>
+        <button onclick="resetForm()" style="background:#95a5a6; margin-top:10px;">入力をクリア（新規登録に戻る）</button>
+    </div>
+
+    <div class="box">
+        <h2>3. 登録済みライブ一覧（修正・削除）</h2>
+        <div id="live-list">読み込み中...</div>
+    </div>
+
     <div id="status"></div>
-</div>
 
-<script>
-    const REPO = "shinoefuhi/shinoefuhi-site";
+    <script>
+        const REPO = "shinoefuhi/shinoefuhi-site"; // あなたのリポジトリ
+        const tokenInput = document.getElementById('token');
 
-    // 保存ボタンを押した時の処理
-    async function saveToGitHub() {
-        const token = document.getElementById('gh-token').value;
-        const status = document.getElementById('status');
-        
-        if (!token) { status.innerText = "❌ トークンを入力してください"; return; }
-        localStorage.setItem('gh_token_shino', token); // ブラウザに保存
+        // ページ読み込み時にトークンを復元し、一覧を表示
+        window.onload = () => {
+            const savedToken = localStorage.getItem('gh_token');
+            if (savedToken) tokenInput.value = savedToken;
+            loadLiveList();
+        };
 
-        const date = document.getElementById('live-date').value;
-        const title = document.getElementById('live-title').value;
-        if (!date || !title) { status.innerText = "❌ 日付とタイトルは必須です"; return; }
+        // 一覧を読み込む
+        async function loadLiveList() {
+            const listDiv = document.getElementById('live-list');
+            const token = tokenInput.value;
+            if (!token) {
+                listDiv.innerHTML = "トークンを入力すると一覧が表示されます。";
+                return;
+            }
 
-        status.innerText = "⏳ 保存中...";
+            try {
+                const res = await fetch(`https://api.github.com/repos/${REPO}/contents/_data/lives`, {
+                    headers: { 'Authorization': `token ${token}` }
+                });
+                if (!res.ok) throw new Error();
+                const files = await res.json();
 
-        // YAMLデータの作成
-        const yamlContent = `date: "${date}"
-title: "${title}"
-place: "${document.getElementById('live-place').value}"
-open_time: "${document.getElementById('live-open').value}"
-start_time: "${document.getElementById('live-start').value}"
-price: "${document.getElementById('live-price').value}"
-artists: "${document.getElementById('live-artists').value}"
-ticketUrl: "${document.getElementById('live-url').value}"`;
+                listDiv.innerHTML = "";
+                files.forEach(file => {
+                    const item = document.createElement('div');
+                    item.className = 'live-item';
+                    item.innerHTML = `
+                        <span>${file.name}</span>
+                        <div>
+                            <span class="edit-link" onclick="prepareEdit('${file.path}', '${file.sha}')">修正</span> | 
+                            <button class="delete-btn" onclick="deleteLive('${file.path}', '${file.sha}')">削除</button>
+                        </div>
+                    `;
+                    listDiv.appendChild(item);
+                });
+            } catch (e) {
+                listDiv.innerHTML = "データの取得に失敗しました。トークンやリポジトリ名を確認してください。";
+            }
+        }
 
-        const fileName = `${date}-${Math.random().toString(36).substring(7)}.yml`;
-        const path = `_data/lives/${fileName}`;
-        const url = `https://api.github.com/repos/${REPO}/contents/${path}`;
-
-        try {
-            const response = await fetch(url, {
-                method: "PUT",
-                headers: {
-                    "Authorization": `token ${token}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    message: `Add live: ${title}`,
-                    content: btoa(unescape(encodeURIComponent(yamlContent))) // Base64エンコード
-                })
+        // 修正の準備
+        async function prepareEdit(path, sha) {
+            const token = tokenInput.value;
+            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+                headers: { 'Authorization': `token ${token}` }
+            });
+            const data = await res.json();
+            const content = decodeURIComponent(escape(atob(data.content)));
+            
+            // 簡易的な解析（YAMLを自前でパース）
+            const lines = content.split('\n');
+            const info = {};
+            lines.forEach(line => {
+                const [key, ...val] = line.split(':');
+                if (key) info[key.trim()] = val.join(':').trim();
             });
 
-            if (response.ok) {
-                status.style.color = "green";
-                status.innerText = "✅ 保存完了！数分後にHPに反映されます。";
-                // 入力欄をクリア
-                document.querySelectorAll('input:not([type=password])').forEach(i => i.value = "");
-            } else {
-                const err = await response.json();
-                status.style.color = "red";
-                status.innerText = "❌ エラー: " + err.message;
-            }
-        } catch (e) {
-            status.innerText = "❌ 接続失敗: " + e.message;
+            document.getElementById('date').value = info.date || "";
+            document.getElementById('title').value = info.title || "";
+            document.getElementById('place').value = info.place || "";
+            document.getElementById('ticketUrl').value = info.ticketUrl || "";
+            document.getElementById('edit-sha').value = sha;
+            document.getElementById('form-title').innerText = "2. ライブ情報の修正（上書きモード）";
+            window.scrollTo(0, 0);
         }
-    }
 
-    // 読み込み時に保存されたトークンを呼び出す
-    window.onload = () => {
-        const savedToken = localStorage.getItem('gh_token_shino');
-        if (savedToken) document.getElementById('gh-token').value = savedToken;
-    };
-</script>
+        // 保存（新規・上書き）
+        async function saveLive() {
+            const token = tokenInput.value;
+            const date = document.getElementById('date').value;
+            const title = document.getElementById('title').value;
+            const place = document.getElementById('place').value;
+            const ticketUrl = document.getElementById('ticketUrl').value;
+            const sha = document.getElementById('edit-sha').value;
+
+            if (!token || !date || !title) {
+                alert("トークン、日付、タイトルは必須です。");
+                return;
+            }
+
+            localStorage.setItem('gh_token', token);
+
+            const fileName = `${date}-${title.replace(/\s+/g, '-')}.yml`;
+            const path = `_data/lives/${fileName}`;
+            const yamlContent = `date: ${date}\ntitle: ${title}\nplace: ${place}\nticketUrl: ${ticketUrl}`;
+            const base64Content = btoa(unescape(encodeURIComponent(yamlContent)));
+
+            const body = {
+                message: `Update live: ${fileName}`,
+                content: base64Content
+            };
+            if (sha) body.sha = sha; // 修正時はshaを付与
+
+            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+                method: 'PUT',
+                headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+
+            if (res.ok) {
+                showStatus("保存に成功しました！反映まで数分お待ちください。", "green");
+                resetForm();
+                loadLiveList();
+            } else {
+                showStatus("エラーが発生しました。", "red");
+            }
+        }
+
+        // 削除
+        async function deleteLive(path, sha) {
+            if (!confirm("本当にこのライブ情報を削除しますか？")) return;
+            const token = tokenInput.value;
+
+            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: "Delete live", sha: sha })
+            });
+
+            if (res.ok) {
+                showStatus("削除しました。", "orange");
+                loadLiveList();
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('date').value = "";
+            document.getElementById('title').value = "";
+            document.getElementById('place').value = "";
+            document.getElementById('ticketUrl').value = "";
+            document.getElementById('edit-sha').value = "";
+            document.getElementById('form-title').innerText = "2. ライブ情報の新規登録 / 修正";
+        }
+
+        function showStatus(msg, color) {
+            const s = document.getElementById('status');
+            s.innerText = msg;
+            s.style.display = "block";
+            s.style.backgroundColor = color === "green" ? "#dff0d8" : "#f2dede";
+            setTimeout(() => s.style.display = "none", 5000);
+        }
+    </script>
 </body>
 </html>

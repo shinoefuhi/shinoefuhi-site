@@ -117,22 +117,47 @@ h2{
  height:100%;
  border-radius:6px;
 }
-.disc-grid{
- display:grid;
- grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
- gap:40px;
+/* ディスコグラフィー全体の並び */
+.disc-grid {
+    display: grid;
+    /* 1つあたりを小さくし、画面幅に合わせて自動で 2枚〜3枚 並ぶように設定 */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+    gap: 30px; /* アイテム同士の隙間 */
+    margin-top: 40px;
 }
-.disc-item{
- background:#fff;
- padding:20px;
- box-shadow:8px 8px 0 rgba(253,253,150,.4);
- text-align:center;
+
+/* 各アイテムの装飾 */
+.disc-item {
+    background: #fff;
+    padding: 15px;
+    /* 影を細くして圧迫感を抑える */
+    box-shadow: 4px 4px 0 rgba(253, 253, 150, 0.4);
+    text-align: center;
+    transition: transform 0.3s ease;
 }
-.disc-item img{
- width:100%;
- aspect-ratio:1/1;
- object-fit:cover;
- loading:lazy;
+
+.disc-item:hover {
+    transform: translateY(-5px); /* 少し浮き上がる演出 */
+}
+
+/* ジャケット画像 */
+.disc-item img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 2px;
+}
+
+/* タイトルとアイコンを小さく */
+.disc-item h3 {
+    font-size: 0.9rem;
+    margin: 15px 0 8px;
+    letter-spacing: 0.05em;
+}
+
+.disc-item .social-links {
+    gap: 15px;
+    font-size: 1.1rem;
 }
 .social-links{
  display:flex;

@@ -178,7 +178,8 @@ footer{
 </header>
 
 <nav aria-label="Main Navigation">
-<a href="#news">NEWS</a>
+<a href="#news">NEWS / LIVE</a>
+<a href="archive.html">ARCHIVE</a>
 <a href="#discography">DISCOGRAPHY</a>
 <a href="#movie">MOVIE</a>
 <a href="#contact">CONTACT</a>
@@ -216,65 +217,82 @@ allowfullscreen></iframe>
 <footer>&copy; 2026 shinoefuhi.</footer>
 
 <script>
-async function loadJSON(url){
- const res = await fetch(url);
- if(!res.ok) throw new Error();
- return res.json();
+// 設定：自分のリポジトリ名に合わせてください
+const REPO = "shinoefuhi/shinoefuhi-site";
+
+async function loadLives() {
+    const list = document.getElementById("live-list");
+    try {
+        // 1. GitHub APIを使ってフォルダ内のファイル一覧を取得
+        const res = await fetch(`https://api.github.com/repos/${REPO}/contents/_data/lives`);
+        if (!res.ok) throw new Error("Folder not found");
+        const files = await res.json();
+
+        // 2. 各ファイルの中身を取得して解析
+        const livePromises = files.filter(f => f.name.endsWith('.yml')).map(async (file) => {
+            const contentRes = await fetch(file.download_url);
+            const yamlText = await contentRes.text();
+            return jsyaml.load(yamlText); // YAMLをJavaScriptオブジェクトに変換
+        });
+
+        const lives = await Promise.all(livePromises);
+        
+        // 3. 日付順に並び替え
+        lives.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        const today = new Date().setHours(0, 0, 0, 0);
+        const future = lives.filter(l => new Date(l.date) >= today);
+
+        if (!future.length) {
+            list.innerHTML = "<p style='text-align:center'>現在予定されているライブはありません。</p>";
+            return;
+        }
+
+        list.innerHTML = "";
+        future.forEach(l => {
+            const el = document.createElement("div");
+            el.className = "live-item";
+            el.innerHTML = `
+                <div class="live-date">${l.date.replace(/-/g, '.')}</div>
+                <div class="live-info">
+                    <strong>${l.title}</strong><br>
+                    <span style="color:#777">@ ${l.place}</span><br>
+                    <small>${l.open_time ? 'OPEN ' + l.open_time : ''} / ${l.start_time ? 'START ' + l.start_time : ''}</small>
+                </div>
+                ${l.ticketUrl ? `<a href="${l.ticketUrl}" target="_blank" class="btn">TICKET</a>` : ""}
+            `;
+            list.appendChild(el);
+        });
+    } catch (e) {
+        console.error(e);
+        list.innerHTML = "<p style='text-align:center'>読み込みに失敗しました。しばらく時間を置いてお試しください。</p>";
+    }
 }
 
-async function loadLives(){
- const list = document.getElementById("live-list");
- try{
-  const lives = await loadJSON("/data/lives.json");
-  const today = new Date().setHours(0,0,0,0);
-  const future = lives.filter(l => new Date(l.date) >= today);
-
-  if(!future.length){
-    list.innerHTML = "<p style='text-align:center'>現在予定されているライブはありません。</p>";
-    return;
-  }
-
-  list.innerHTML = "";
-  future.forEach(l => {
-    const el = document.createElement("div");
-    el.className = "live-item";
-    el.innerHTML = `
-      <div class="live-date">${l.date.replace(/-/g,'.')}</div>
-      <div class="live-info">
-        <strong>${l.title}</strong><br>
-        <span style="color:#777">@ ${l.place}</span>
-      </div>
-      ${l.ticketUrl ? `<a href="${l.ticketUrl}" target="_blank" class="btn">TICKET</a>` : ""}
-    `;
-    list.appendChild(el);
-  });
- }catch{
-  list.innerHTML = "<p style='text-align:center'>読み込みに失敗しました。</p>";
- }
-}
-
-async function loadDiscography(){
- const grid = document.getElementById("disc-list");
- const discs = await loadJSON("/data/discography.json");
-
- discs.forEach(d => {
-  const el = document.createElement("div");
-  el.className = "disc-item";
-  el.innerHTML = `
-    <img src="${d.image}" alt="${d.title}">
-    <h3>${d.title}</h3>
-    <div class="social-links">
-      ${d.youtube ? `<a href="${d.youtube}"><i class="fab fa-youtube"></i></a>` : ""}
-      ${d.spotify ? `<a href="${d.spotify}"><i class="fab fa-spotify"></i></a>` : ""}
-    </div>
-  `;
-  grid.appendChild(el);
- });
+// Discographyは以前のまま（必要に応じて修正してください）
+async function loadDiscography() {
+    const grid = document.getElementById("disc-list");
+    try {
+        const res = await fetch("/data/discography.json");
+        const discs = await res.json();
+        discs.forEach(d => {
+            const el = document.createElement("div");
+            el.className = "disc-item";
+            el.innerHTML = `
+                <img src="${d.image}" alt="${d.title}">
+                <h3>${d.title}</h3>
+                <div class="social-links">
+                    ${d.youtube ? `<a href="${d.youtube}"><i class="fab fa-youtube"></i></a>` : ""}
+                    ${d.spotify ? `<a href="${d.spotify}"><i class="fab fa-spotify"></i></a>` : ""}
+                </div>
+            `;
+            grid.appendChild(el);
+        });
+    } catch (e) { console.error(e); }
 }
 
 loadLives();
 loadDiscography();
 </script>
-
 </body>
 </html>

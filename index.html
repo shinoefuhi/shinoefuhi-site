@@ -222,27 +222,23 @@ allowfullscreen></iframe>
 <footer>&copy; 2026 shinoefuhi.</footer>
 
 <script>
-// 設定：自分のリポジトリ名に合わせてください
 const REPO = "shinoefuhi/shinoefuhi-site";
 
+// 1. ライブ情報の読み込み
 async function loadLives() {
     const list = document.getElementById("live-list");
     try {
-        // 1. GitHub APIを使ってフォルダ内のファイル一覧を取得
         const res = await fetch(`https://api.github.com/repos/${REPO}/contents/_data/lives`);
-        if (!res.ok) throw new Error("Folder not found");
+        if (!res.ok) throw new Error();
         const files = await res.json();
 
-        // 2. 各ファイルの中身を取得して解析
         const livePromises = files.filter(f => f.name.endsWith('.yml')).map(async (file) => {
             const contentRes = await fetch(file.download_url);
             const yamlText = await contentRes.text();
-            return jsyaml.load(yamlText); // YAMLをJavaScriptオブジェクトに変換
+            return jsyaml.load(yamlText);
         });
 
         const lives = await Promise.all(livePromises);
-        
-        // 3. 日付順に並び替え
         lives.sort((a, b) => new Date(a.date) - new Date(b.date));
 
         const today = new Date().setHours(0, 0, 0, 0);
@@ -262,24 +258,40 @@ async function loadLives() {
                 <div class="live-info">
                     <strong>${l.title}</strong><br>
                     <span style="color:#777">@ ${l.place}</span><br>
-                    <small>${l.open_time ? 'OPEN ' + l.open_time : ''} / ${l.start_time ? 'START ' + l.start_time : ''}</small>
+                    <small style="color:#888; font-size:0.85rem;">
+                        ${l.open_time ? 'OPEN ' + l.open_time : ''} ${l.start_time ? '/ START ' + l.start_time : ''}
+                        ${l.price ? '<br>TICKET: ' + l.price : ''}
+                    </small>
                 </div>
-                ${l.ticketUrl ? `<a href="${l.ticketUrl}" target="_blank" class="btn">TICKET</a>` : ""}
+                <div style="display:flex; gap:10px; align-items:center;">
+                    ${l.ticketUrl ? `<a href="${l.ticketUrl}" target="_blank" class="btn">TICKET</a>` : ""}
+                    ${l.twitterUrl ? `<a href="${l.twitterUrl}" target="_blank" class="btn" style="background:#000;color:#fff;padding:8px 12px;"><i class="fa-brands fa-x-twitter"></i></a>` : ""}
+                </div>
             `;
             list.appendChild(el);
         });
     } catch (e) {
-        console.error(e);
-        list.innerHTML = "<p style='text-align:center'>読み込みに失敗しました。しばらく時間を置いてお試しください。</p>";
+        list.innerHTML = "<p style='text-align:center'>読み込みに失敗しました。</p>";
     }
 }
 
-// Discographyは以前のまま（必要に応じて修正してください）
+// 2. Discographyの読み込み（新方式）
 async function loadDiscography() {
     const grid = document.getElementById("disc-list");
     try {
-        const res = await fetch("/data/discography.json");
-        const discs = await res.json();
+        const res = await fetch(`https://api.github.com/repos/${REPO}/contents/_data/discography`);
+        if (!res.ok) return; // フォルダが空の場合は何もしない
+        const files = await res.json();
+
+        const discPromises = files.filter(f => f.name.endsWith('.yml')).map(async (file) => {
+            const contentRes = await fetch(file.download_url);
+            const yamlText = await contentRes.text();
+            return jsyaml.load(yamlText);
+        });
+
+        const discs = await Promise.all(discPromises);
+        
+        grid.innerHTML = ""; // 初期化
         discs.forEach(d => {
             const el = document.createElement("div");
             el.className = "disc-item";
@@ -287,13 +299,15 @@ async function loadDiscography() {
                 <img src="${d.image}" alt="${d.title}">
                 <h3>${d.title}</h3>
                 <div class="social-links">
-                    ${d.youtube ? `<a href="${d.youtube}"><i class="fab fa-youtube"></i></a>` : ""}
-                    ${d.spotify ? `<a href="${d.spotify}"><i class="fab fa-spotify"></i></a>` : ""}
+                    ${d.youtube ? `<a href="${d.youtube}" target="_blank"><i class="fab fa-youtube"></i></a>` : ""}
+                    ${d.spotify ? `<a href="${d.spotify}" target="_blank"><i class="fab fa-spotify"></i></a>` : ""}
                 </div>
             `;
             grid.appendChild(el);
         });
-    } catch (e) { console.error(e); }
+    } catch (e) {
+        console.error("Discography load error:", e);
+    }
 }
 
 loadLives();

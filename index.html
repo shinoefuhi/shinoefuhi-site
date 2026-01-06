@@ -18,77 +18,71 @@
 <link rel="canonical" href="https://shinoefuhi.com/">
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;600&family=Montserrat:wght@300;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200;300;600&family=Montserrat:wght@100;200;300;600&display=swap">
 <script src="https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js"></script>
 
 <style>
-:root{
- --bg:#f8fafd;
- --text:#2c3e50;
- --sub:#7f8c8d;
- --accent:#fdfd96;
+/* --- 1. 全体の背景と基調（有機的な光の質感） --- */
+::root {
+    --bg: #fcfcfc; 
+    --text: #1a1a1a;
+    --sub: #8e8e8e;
+    --accent: #fdfd96;
 }
-html{scroll-behavior:smooth}
-body{
- margin:0;
- background:var(--bg);
- color:var(--text);
- font-family:'Noto Serif JP',serif;
- line-height:1.8;
+
+body {
+    margin: 0;
+    /* 有機的な光のグラデーション背景 */
+    background: radial-gradient(circle at 50% 0%, #fff 0%, #f4f7f9 100%);
+    background-attachment: fixed; 
+    color: var(--text);
+    font-family: 'Noto Serif JP', serif;
+    font-weight: 200; /* 先鋭的な細い文字 */
+    line-height: 2.2; /* 広めの行間 */
+    -webkit-font-smoothing: antialiased;
 }
-a{text-decoration:none;color:inherit}
-header{
- height:100vh;
- display:flex;
- align-items:center;
- justify-content:center;
- position:relative;
- overflow:hidden;
+
+/* --- 2. セクションごとの有機的な変化 --- */
+section {
+    padding: 160px 20px; /* 余白を増やして空間を贅沢に使う */
+    position: relative;
 }
-.hero-bg{
- position:absolute;
- inset:0;
- background:url('artist-photo.jpg') center/cover no-repeat;
- filter:brightness(.75);
- transform:scale(1.05);
- z-index:-1;
+
+/* 偶数番目のセクションにだけ、わずかな影のニュアンスを加える */
+section:nth-child(even) {
+    background: rgba(240, 244, 248, 0.3);
 }
-.hero-content{text-align:center;color:#fff}
-.main-emblem{
- width:260px;
- animation:float 6s ease-in-out infinite;
+
+/* --- 3. 先鋭的なタイポグラフィ（H2の見出し） --- */
+h2 {
+    text-align: center;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 100; /* 極細 */
+    letter-spacing: 0.6rem; /* 広い字間 */
+    margin-bottom: 80px;
+    font-size: 1.8rem;
 }
-@keyframes float{
- 0%,100%{transform:translateY(0)}
- 50%{transform:translateY(-12px)}
+
+/* 見出しの下に繊細なラインを追加（追加分） */
+h2::after {
+    content: '';
+    display: block;
+    width: 30px;
+    height: 1px;
+    background: #000;
+    margin: 25px auto 0;
+    opacity: 0.2;
 }
-h1{
- font-family:'Montserrat',sans-serif;
- font-weight:300;
- letter-spacing:.4rem;
-}
-nav a:hover{color:#4b7bec}
-section{
- padding:110px 20px;
- max-width:1000px;
- margin:auto;
-}
-h2{
- text-align:center;
- font-family:'Montserrat',sans-serif;
- font-weight:300;
- letter-spacing:.3rem;
- margin-bottom:60px;
-}
-.live-item{
- background:#fff;
- padding:24px;
- margin-bottom:20px;
- border-left:4px solid var(--accent);
- box-shadow:0 8px 20px rgba(0,0,0,.06);
- display:flex;
- flex-wrap:wrap;
- gap:20px;
+
+/* --- 4. ライブ情報のカードをより有機的に --- */
+.live-item {
+    background: rgba(255, 255, 255, 0.6); /* 透過させて背景と馴染ませる */
+    backdrop-filter: blur(5px);
+    border: none; /* 固い境界線を消す */
+    border-left: 1px solid var(--accent); /* 線を細く */
+    box-shadow: 0 15px 35px rgba(0,0,0,0.03); /* 影を極めて薄く、広く */
+    padding: 40px;
+    border-radius: 2px; /* 角を丸めすぎず、鋭さを残す */
 }
 .live-date{
  min-width:140px;
@@ -219,8 +213,8 @@ nav a {
     text-decoration: none;
     color: #1a1a1a;
     font-size: 13px;
-    letter-spacing: 0.25em; /* 先鋭的な広い文字間隔 */
-    font-weight: 300;
+    letter-spacing: 0.3em; /* 先鋭的な広い文字間隔 */
+    font-weight: 100;
     font-family: 'Montserrat', sans-serif;
     transition: all 0.4s ease;
     position: relative;

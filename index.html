@@ -164,6 +164,42 @@ footer{
  .main-emblem{width:200px}
  .live-item{flex-direction:column}
 }
+ /* スマホで横にはみ出すのを防ぐ魔法のコード */
+html, body {
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* ライブ情報のレイアウトをスマホで縦並びに調整 */
+.live-item > div {
+    flex-wrap: wrap !important;
+}
+
+@media (max-width: 600px) {
+    /* フォームの左右の余白を削って画面に収める */
+    #contact {
+        padding: 40px 10px !important;
+    }
+    
+    #contact > div {
+        border-radius: 0 !important; /* スマホでは角丸をなくすとスッキリします */
+    }
+
+    /* ライブ情報の画像とテキストをスマホでは縦に並べる */
+    .live-item > div {
+        flex-direction: column;
+        gap: 10px !important;
+    }
+    
+    .live-item img {
+        width: 100% !important;
+        max-width: 200px;
+        margin: 0 auto;
+        display: block;
+    }
+}
 </style>
 </head>
 

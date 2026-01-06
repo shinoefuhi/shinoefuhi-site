@@ -254,7 +254,12 @@ async function loadLives() {
                 const el = document.createElement("div");
                 el.className = "live-item";
                 el.innerHTML = `
-                    <div class="live-date">${String(l.date).replace(/-/g, '.')}</div>
+                    <div class="live-date">
+    ${(() => {
+        const d = new Date(l.date);
+        return isNaN(d) ? String(l.date) : `${d.getFullYear()}.${('0' + (d.getMonth() + 1)).slice(-2)}.${('0' + d.getDate()).slice(-2)}`;
+    })()}
+</div>
                     <div class="live-info">
                         <strong>${l.title}</strong><br>
                         <span style="color:#777">@ ${l.place}</span><br>

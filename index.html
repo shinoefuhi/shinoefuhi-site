@@ -202,42 +202,48 @@ html, body {
 }
 /* --- 中略（既存のコードがある場所） --- */
 
-/* 1. ナビゲーション全体の調整 */
+/* 1. ナビゲーション全体の調整（横スクロールを許可） */
 nav {
     width: 100%;
     max-width: 100vw;
     box-sizing: border-box;
+    overflow-x: auto; /* はみ出した時に横スクロールさせる */
+    -webkit-overflow-scrolling: touch; /* スマホで滑らかに動かす */
+}
+
+/* スクロールバーを非表示にする（見た目スッキリ） */
+nav::-webkit-scrollbar {
+    display: none;
 }
 
 /* 2. メニュー項目の並びを調整 */
 nav ul {
     display: flex;
-    justify-content: center;
-    flex-wrap: wrap; /* 画面が狭い時に自動で2行にする設定 */
+    justify-content: center; /* パソコンでは中央寄せ */
     padding: 0;
     margin: 0;
     list-style: none;
+    white-space: nowrap; /* 改行させずに横一行に固定する（重要！） */
 }
 
 /* 3. 各メニューの間隔 */
 nav ul li {
-    margin: 0 10px;
+    margin: 0 15px;
 }
 
 /* 4. スマホ（画面幅600px以下）の時の見栄え */
 @media (max-width: 600px) {
     nav ul {
-        padding: 10px 0;
+        justify-content: flex-start; /* スライドさせるために左寄せにする */
+        padding: 15px 20px; /* 左右に余白を作ってスライドしやすくする */
     }
     nav ul li {
-        margin: 5px 8px; /* 間隔を狭める */
+        margin: 0 12px; /* スマホでの間隔 */
     }
     nav ul li a {
-        font-size: 13px; /* 文字を少し小さくして収まりを良くする */
-        letter-spacing: 0; /* 文字の間隔を詰める */
+        font-size: 15px; /* 文字は小さくせず、読みやすさ優先 */
     }
 }
-
 /* --- 中略（既存のコードがある場所） --- */
 </style>
 </head>

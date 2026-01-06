@@ -341,6 +341,27 @@ nav a:hover::after {
     opacity: 1;
 }
 /* --- 中略（既存のコードがある場所） --- */
+/* ディスコグラフィーのサイズを強制的に調整 */
+#disc-list.disc-grid {
+    display: grid !important;
+    /* 150px〜200pxの間で、横に並べる */
+    grid-template-columns: repeat(auto-fit, minmax(150px, 200px)) !important; 
+    justify-content: center; /* 中央寄せ */
+    gap: 20px !important;
+}
+
+#disc-list .disc-item {
+    max-width: 200px; /* 1つのアイテムの最大幅を制限 */
+    margin: 0 auto;
+    padding: 10px !important;
+}
+
+#disc-list .disc-item img {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1 !important;
+}
+ 
 </style>
 </head>
 

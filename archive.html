@@ -1,12 +1,55 @@
-<script src="https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js"></script>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARCHIVE | shinoefuhi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;600&family=Montserrat:wght@300;600&display=swap">
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js"></script>
+    <style>
+        /* index.htmlのスタイルを継承 */
+        :root { --bg:#f8fafd; --text:#2c3e50; --sub:#7f8c8d; --accent:#fdfd96; }
+        body { margin:0; background:var(--bg); color:var(--text); font-family:'Noto Serif JP',serif; line-height:1.8; }
+        nav { position:sticky; top:0; backdrop-filter:blur(12px); background:rgba(255,255,255,.9); padding:18px; display:flex; justify-content:center; gap:40px; font-family:'Montserrat',sans-serif; font-size:.85rem; z-index:100; }
+        section { padding:60px 20px; max-width:1000px; margin:auto; }
+        h2 { text-align:center; font-family:'Montserrat',sans-serif; font-weight:300; letter-spacing:.3rem; margin-bottom:60px; }
+        .live-item { background:#fff; padding:24px; margin-bottom:20px; border-left:4px solid var(--sub); box-shadow:0 8px 20px rgba(0,0,0,.06); display:flex; flex-wrap:wrap; gap:20px; }
+        .live-date { min-width:140px; font-family:'Montserrat',sans-serif; font-weight:600; }
+        .btn { border:1px solid var(--text); padding:8px 20px; border-radius:30px; font-size:.8rem; transition:.3s; display:inline-block; margin-top:20px; }
+        .btn:hover { background:var(--text); color:#fff; }
+        footer { text-align:center; padding:60px; font-size:.75rem; color:var(--sub); }
+        a { text-decoration:none; color:inherit; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="index.html">TOP</a>
+    <a href="index.html#news">NEWS</a>
+</nav>
+
+<section>
+    <h2>PAST LIVES (ARCHIVE)</h2>
+    <div id="archive-list">
+        <p style="text-align:center">Loading archives...</p>
+    </div>
+    
+    <div style="text-align:center; margin-top:40px;">
+        <a href="index.html" class="btn"><i class="fa-solid fa-arrow-left"></i> BACK TO TOP</a>
+    </div>
+</section>
+
+<footer>&copy; 2026 shinoefuhi.</footer>
 
 <script>
 const REPO = "shinoefuhi/shinoefuhi-site";
 
 async function loadArchive() {
-    const list = document.getElementById("archive-list"); // archive.html内のIDに合わせてください
+    const list = document.getElementById("archive-list");
     try {
         const res = await fetch(`https://api.github.com/repos/${REPO}/contents/_data/lives`);
+        if (!res.ok) throw new Error();
         const files = await res.json();
 
         const livePromises = files.filter(f => f.name.endsWith('.yml')).map(async (file) => {
@@ -17,32 +60,36 @@ async function loadArchive() {
 
         const lives = await Promise.all(livePromises);
         
-        // 過去のライブだけを抽出し、新しい順に並べる
+        // 今日より前の日付を抽出して、新しい順（降順）に並び替え
         const today = new Date().setHours(0, 0, 0, 0);
         const past = lives.filter(l => new Date(l.date) < today)
                           .sort((a, b) => new Date(b.date) - new Date(a.date));
 
         if (!past.length) {
-            list.innerHTML = "<p>過去のライブ情報はありません。</p>";
+            list.innerHTML = "<p style='text-align:center'>過去のライブ情報はありません。</p>";
             return;
         }
 
         list.innerHTML = "";
         past.forEach(l => {
             const el = document.createElement("div");
-            el.className = "live-item"; // index.htmlと同じスタイルを使う場合
+            el.className = "live-item";
             el.innerHTML = `
                 <div class="live-date">${l.date.replace(/-/g, '.')}</div>
                 <div class="live-info">
                     <strong>${l.title}</strong><br>
-                    <span>@ ${l.place}</span>
+                    <span style="color:#777">@ ${l.place}</span>
                 </div>
             `;
             list.appendChild(el);
         });
     } catch (e) {
-        list.innerHTML = "<p>読み込みに失敗しました。</p>";
+        console.error(e);
+        list.innerHTML = "<p style='text-align:center'>アーカイブの読み込みに失敗しました。</p>";
     }
 }
+
 loadArchive();
 </script>
+</body>
+</html>

@@ -47,6 +47,8 @@
             <div><label>チケットURL</label><input type="url" id="live-ticket" placeholder="https://..."></div>
             <div><label>Twitter/X 告知URL</label><input type="url" id="live-twitter" placeholder="https://x.com/..."></div>
         </div>
+        <label>フライヤー画像URL (GitHubに上げた写真のURL)</label>
+        <input type="text" id="live-flyer" placeholder="https://raw.githubusercontent.com/...">
         <button onclick="saveItem('live')">ライブ情報を保存</button>
         <button onclick="resetForm('live')" style="background:#95a5a6; margin-top:10px;">入力をクリア</button>
     </div>
@@ -133,6 +135,7 @@
                 document.getElementById('live-start').value = info.start_time || "";
                 document.getElementById('live-ticket').value = info.ticketUrl || "";
                 document.getElementById('live-twitter').value = info.twitterUrl || "";
+                document.getElementById('live-flyer').value = info.flyer || "";
                 document.getElementById('live-sha').value = sha;
                 document.getElementById('live-form-title').innerText = "修正モード中";
             } else {
@@ -140,6 +143,7 @@
                 document.getElementById('disc-image').value = info.image;
                 document.getElementById('disc-youtube').value = info.youtube || "";
                 document.getElementById('disc-spotify').value = info.spotify || "";
+                document.getElementById('live-flyer').value = info.flyer || "";
                 document.getElementById('disc-sha').value = sha;
                 document.getElementById('disc-form-title').innerText = "修正モード中";
             }
@@ -157,7 +161,14 @@
                 fileName = `${d}-${t.replace(/\s+/g, '-')}.yml`;
                 path = `_data/lives/${fileName}`;
                 sha = document.getElementById('live-sha').value;
-                yaml = `date: ${d}\ntitle: ${t}\nplace: ${document.getElementById('live-place').value}\nprice: ${document.getElementById('live-price').value}\nopen_time: ${document.getElementById('live-open').value}\nstart_time: ${document.getElementById('live-start').value}\nticketUrl: ${document.getElementById('live-ticket').value}\ntwitterUrl: ${document.getElementById('live-twitter').value}`;
+                yaml = `date: ${d}\ntitle: ${t}
+                \nplace: ${document.getElementById('live-place').value}
+                \nprice: ${document.getElementById('live-price').value}
+                \nopen_time: ${document.getElementById('live-open').value}
+                \nstart_time: ${document.getElementById('live-start').value}
+                \nticketUrl: ${document.getElementById('live-ticket').value}
+                \ntwitterUrl: ${document.getElementById('live-twitter').value}
+                \nflyer: ${document.getElementById('live-flyer').value}`;
             } else {
                 const t = document.getElementById('disc-title').value;
                 fileName = `${t.replace(/\s+/g, '-')}.yml`;

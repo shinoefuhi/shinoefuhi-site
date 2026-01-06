@@ -187,6 +187,58 @@ html, body {
         display: block;
     }
 }
+/* --- MOVIEギャラリーの装飾 --- */
+.video-thumbnails {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+    overflow-x: auto;
+    padding: 10px 0 20px;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* 各サムネイルの枠 */
+.thumb-item {
+    flex: 0 0 160px; /* 横幅を固定 */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 0.6; /* 通常時は少し薄くして奥行きを出す */
+}
+
+.thumb-item img {
+    width: 100%;
+    border-radius: 2px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.thumb-item span {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    margin-top: 8px;
+    text-align: center;
+    font-family: 'Montserrat', sans-serif;
+    color: var(--text);
+}
+
+/* 選択中のサムネイルを強調 */
+.thumb-item.active {
+    opacity: 1;
+    transform: translateY(-3px);
+}
+
+.thumb-item:hover {
+    opacity: 1;
+}
+
+/* スクロールバーのデザインをシンプルに */
+.video-thumbnails::-webkit-scrollbar {
+    height: 2px;
+}
+.video-thumbnails::-webkit-scrollbar-thumb {
+    background: #ddd;
+}
+ 
 /* --- ナビゲーション最終進化版（HTML構造に最適化） --- */
 nav {
     width: 100%;
@@ -301,13 +353,61 @@ nav a:hover::after {
 </section>
 
 <section id="movie">
-<h2>MOVIE</h2>
-<div class="video-wrapper">
-<iframe title="shinoefuhi official movie"
-src="https://www.youtube.com/embed/URuOQ6ymR_Y?autoplay=1&mute=1&loop=1&playlist=URuOQ6ymR_Y"
-allowfullscreen></iframe>
-</div>
+    <h2>MOVIE</h2>
+    
+    <div class="video-wrapper">
+        <iframe id="main-video" 
+            src="https://www.youtube.com/embed/URuOQ6ymR_Y?rel=0" 
+            title="shinoefuhi video player"
+            allowfullscreen>
+        </iframe>
+    </div>
+
+    <div class="video-thumbnails">
+        <div class="thumb-item active" onclick="changeVideo('URuOQ6ymR_Y', this)">
+            <img src="https://img.youtube.com/vi/URuOQ6ymR_Y/mqdefault.jpg" alt="Landscape">
+            <span>landscape</span>
+        </div>
+        <div class="thumb-item" onclick="changeVideo('28WMAn58EjA', this)">
+            <img src="https://img.youtube.com/vi/28WMAn58EjA/mqdefault.jpg" alt="Video 1">
+            <span>ブルーシトロン</span>
+        </div>
+        <div class="thumb-item" onclick="changeVideo('OOukN9K-XrE', this)">
+            <img src="https://img.youtube.com/vi/OOukN9K-XrE/mqdefault.jpg" alt="Video 2">
+            <span>ソア区域</span>
+        </div>
+        <div class="thumb-item" onclick="changeVideo('DeA_0HUQJDw', this)">
+            <img src="https://img.youtube.com/vi/DeA_0HUQJDw/mqdefault.jpg" alt="Video 3">
+            <span>海底</span>
+        </div>
+        <div class="thumb-item" onclick="changeVideo('qujV467akSQ', this)">
+            <img src="https://img.youtube.com/vi/qujV467akSQ/mqdefault.jpg" alt="Video 4">
+            <span>haise</span>
+        </div>
+        <div class="thumb-item" onclick="changeVideo('5ZKROIroMXE', this)">
+            <img src="https://img.youtube.com/vi/5ZKROIroMXE/mqdefault.jpg" alt="Video 5">
+            <span>私の聖域</span>
+        </div>
+        <div class="thumb-item" onclick="changeVideo('NVFjb3UiNNg', this)">
+            <img src="https://img.youtube.com/vi/NVFjb3UiNNg/mqdefault.jpg" alt="Video 6">
+            <span>twilight</span>
+        </div>
+    </div>
 </section>
+
+<script>
+function changeVideo(id, el) {
+    // 1. メイン動画を切り替え
+    document.getElementById('main-video').src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;
+    
+    // 2. アクティブなサムネイルの見た目を変更
+    document.querySelectorAll('.thumb-item').forEach(item => item.classList.remove('active'));
+    el.classList.add('active');
+    
+    // 3. メイン動画の位置へスムーズにスクロール（スマホ等で便利）
+    document.getElementById('movie').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
 
 <section id="contact" style="padding: 60px 20px;">
     <h2 style="text-align:center; margin-bottom: 40px;">SNS / CONTACT</h2>

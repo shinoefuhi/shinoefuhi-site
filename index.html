@@ -200,6 +200,48 @@ html, body {
         display: block;
     }
 }
+
+ <style>
+/* --- 中略（既存のコードがある場所） --- */
+
+/* 1. ナビゲーション全体の調整 */
+nav {
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
+}
+
+/* 2. メニュー項目の並びを調整 */
+nav ul {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap; /* 画面が狭い時に自動で2行にする設定 */
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+/* 3. 各メニューの間隔 */
+nav ul li {
+    margin: 0 10px;
+}
+
+/* 4. スマホ（画面幅600px以下）の時の見栄え */
+@media (max-width: 600px) {
+    nav ul {
+        padding: 10px 0;
+    }
+    nav ul li {
+        margin: 5px 8px; /* 間隔を狭める */
+    }
+    nav ul li a {
+        font-size: 13px; /* 文字を少し小さくして収まりを良くする */
+        letter-spacing: 0; /* 文字の間隔を詰める */
+    }
+}
+
+/* --- 中略（既存のコードがある場所） --- */
+</style>
 </style>
 </head>
 
@@ -214,7 +256,7 @@ html, body {
 </header>
 
 <nav aria-label="Main Navigation">
-<a href="#news">NEWS / LIVE</a>
+<a href="#news">LIVE</a>
 <a href="archive.html">ARCHIVE</a>
 <a href="#discography">DISCOGRAPHY</a>
 <a href="#movie">MOVIE</a>
@@ -222,7 +264,7 @@ html, body {
 </nav>
 
 <section id="news">
-  <h2>NEWS / LIVE</h2> <div id="live-list">
+  <h2>LIVE</h2> <div id="live-list">
     <p style="text-align:center">Loading...</p>
   </div>
 

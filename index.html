@@ -27,16 +27,33 @@
  --text:#2c3e50;
  --sub:#7f8c8d;
  --accent:#fdfd96;
+ --shadow: rgba(0, 0, 0, 0.08);
 }
-html{scroll-behavior:smooth}
+
+* {
+ box-sizing: border-box;
+}
+
+html{
+ scroll-behavior:smooth;
+ overflow-x: hidden;
+}
+
 body{
  margin:0;
  background:var(--bg);
  color:var(--text);
  font-family:'Noto Serif JP',serif;
  line-height:1.8;
+ overflow-x: hidden;
 }
-a{text-decoration:none;color:inherit}
+
+a{
+ text-decoration:none;
+ color:inherit;
+}
+
+/* ===== HERO SECTION ===== */
 header{
  height:100vh;
  display:flex;
@@ -45,323 +62,397 @@ header{
  position:relative;
  overflow:hidden;
 }
+
 .hero-bg{
  position:absolute;
  inset:0;
  background:url('artist-photo.jpg') center/cover no-repeat;
- filter:brightness(.75);
- transform:scale(1.05);
+ filter:brightness(.7);
+ transform:scale(1);
  z-index:-1;
+ animation: heroZoom 20s ease-in-out infinite alternate;
 }
-.hero-content{text-align:center;color:#fff}
+
+@keyframes heroZoom {
+ 0% { transform: scale(1); }
+ 100% { transform: scale(1.08); }
+}
+
+.hero-content{
+ text-align:center;
+ color:#fff;
+ animation: fadeInUp 1.2s ease-out;
+}
+
+@keyframes fadeInUp {
+ from {
+  opacity: 0;
+  transform: translateY(30px);
+ }
+ to {
+  opacity: 1;
+  transform: translateY(0);
+ }
+}
+
 .main-emblem{
  width:400px;
- animation:float 6s ease-in-out infinite;
+ animation: float 6s ease-in-out infinite;
+ filter: drop-shadow(0 10px 30px rgba(0,0,0,0.4));
 }
+
 @keyframes float{
- 0%,100%{transform:translateY(0)}
- 50%{transform:translateY(-12px)}
+ 0%, 100% { transform: translateY(0); }
+ 50% { transform: translateY(-12px); }
 }
+
 h1{
  font-family:'Montserrat',sans-serif;
  font-weight:300;
  letter-spacing:.4rem;
-}
-nav a:hover{color:#4b7bec}
-section{
- padding:110px 20px;
- max-width:1000px;
- margin:auto;
-}
-h2{
- text-align:center;
- font-family:'Montserrat',sans-serif;
- font-weight:300;
- letter-spacing:.3rem;
- margin-bottom:60px;
-}
-.live-item{
- background:#fff;
- padding:24px;
- margin-bottom:20px;
- border-left:4px solid var(--accent);
- box-shadow:0 8px 20px rgba(0,0,0,.06);
- display:flex;
- flex-wrap:wrap;
- gap:20px;
-}
-.live-date{
- min-width:140px;
- font-family:'Montserrat',sans-serif;
- font-weight:600;
-}
-.btn{
- border:1px solid var(--text);
- padding:8px 20px;
- border-radius:30px;
- font-size:.8rem;
- transition:.3s;
-}
-.btn:hover{
- background:var(--text);
- color:#fff;
-}
-.video-wrapper{
- position:relative;
- padding-bottom:56.25%;
-}
-.video-wrapper iframe{
- position:absolute;
- inset:0;
- width:100%;
- height:100%;
- border-radius:6px;
-}
-/* ディスコグラフィー全体の並び */
-.disc-grid {
-    display: grid;
-    /* 1つあたりを小さくし、画面幅に合わせて自動で 2枚〜3枚 並ぶように設定 */
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-    gap: 30px; /* アイテム同士の隙間 */
-    margin-top: 40px;
+ margin-top: 20px;
+ text-shadow: 0 4px 20px rgba(0,0,0,0.3);
 }
 
-/* 各アイテムの装飾 */
+/* ===== NAVIGATION ===== */
+nav {
+ width: 100%;
+ position: sticky;
+ top: 0;
+ z-index: 1000;
+ background: rgba(255, 255, 255, 0.85); 
+ backdrop-filter: blur(20px);
+ -webkit-backdrop-filter: blur(20px);
+ border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+ overflow-x: auto;
+ -webkit-overflow-scrolling: touch;
+ white-space: nowrap;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ box-shadow: 0 2px 20px rgba(0,0,0,0.03);
+ transition: all 0.3s ease;
+}
+
+nav::-webkit-scrollbar { display: none; }
+
+nav a {
+ display: inline-block;
+ padding: 22px 28px;
+ text-decoration: none;
+ color: #1a1a1a;
+ font-size: 13px;
+ letter-spacing: 0.25em;
+ font-weight: 300;
+ font-family: 'Montserrat', sans-serif;
+ transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+ position: relative;
+}
+
+nav a::after {
+ content: '';
+ position: absolute;
+ bottom: 15px;
+ left: 50%;
+ width: 0;
+ height: 1px;
+ background: linear-gradient(90deg, transparent, #000, transparent);
+ transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+ transform: translateX(-50%);
+ opacity: 0;
+}
+
+nav a:hover::after {
+ width: 80%;
+ opacity: 1;
+}
+
+nav a:hover {
+ color: #4b7bec;
+}
+
+@media (max-width: 600px) {
+ nav {
+  justify-content: flex-start;
+  mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+ }
+ 
+ nav a:first-child { margin-left: 80px; }
+ nav a:last-child { margin-right: 80px; }
+}
+
+/* ===== SECTIONS ===== */
+section{
+ padding: 110px 20px;
+ max-width: 1000px;
+ margin: auto;
+ opacity: 0;
+ transform: translateY(40px);
+ transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+section.visible {
+ opacity: 1;
+ transform: translateY(0);
+}
+
+h2{
+ text-align: center;
+ font-family: 'Montserrat', sans-serif;
+ font-weight: 300;
+ letter-spacing: 0.3rem;
+ margin-bottom: 60px;
+ position: relative;
+ padding-bottom: 20px;
+}
+
+h2::after {
+ content: '';
+ position: absolute;
+ bottom: 0;
+ left: 50%;
+ transform: translateX(-50%);
+ width: 60px;
+ height: 1px;
+ background: linear-gradient(to right, transparent, var(--accent), transparent);
+}
+
+/* ===== LIVE ITEMS ===== */
+.live-item{
+ background: #fff;
+ padding: 24px;
+ margin-bottom: 20px;
+ border-left: 4px solid var(--accent);
+ box-shadow: 0 8px 24px var(--shadow);
+ display: flex;
+ flex-wrap: wrap;
+ gap: 20px;
+ border-radius: 4px;
+ transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+ opacity: 0;
+ transform: translateX(-30px);
+}
+
+.live-item.visible {
+ opacity: 1;
+ transform: translateX(0);
+}
+
+.live-item:hover {
+ transform: translateY(-4px);
+ box-shadow: 0 12px 36px rgba(0,0,0,0.12);
+}
+
+.live-date{
+ min-width: 140px;
+ font-family: 'Montserrat', sans-serif;
+ font-weight: 600;
+ color: var(--text);
+}
+
+.btn{
+ border: 1px solid var(--text);
+ padding: 10px 24px;
+ border-radius: 30px;
+ font-size: 0.8rem;
+ transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+ display: inline-block;
+}
+
+.btn:hover {
+ background: var(--text);
+ color: #fff;
+ transform: translateY(-2px);
+ box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+/* ===== DISCOGRAPHY ===== */
+.disc-grid {
+ display: grid;
+ grid-template-columns: repeat(auto-fit, minmax(180px, 220px));
+ justify-content: center;
+ gap: 30px;
+ margin-top: 40px;
+}
+
 .disc-item {
-    background: #fff;
-    padding: 15px;
-    /* 影を細くして圧迫感を抑える */
-    box-shadow: 4px 4px 0 rgba(253, 253, 150, 0.4);
-    text-align: center;
-    transition: transform 0.3s ease;
+ background: #fff;
+ padding: 15px;
+ box-shadow: 6px 6px 0 rgba(253, 253, 150, 0.35);
+ text-align: center;
+ border-radius: 2px;
+ transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+ opacity: 0;
+ transform: scale(0.9);
+}
+
+.disc-item.visible {
+ opacity: 1;
+ transform: scale(1);
 }
 
 .disc-item:hover {
-    transform: translateY(-5px); /* 少し浮き上がる演出 */
+ transform: translateY(-8px) scale(1.02);
+ box-shadow: 8px 12px 0 rgba(253, 253, 150, 0.5);
 }
 
-/* ジャケット画像 */
 .disc-item img {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-    border-radius: 2px;
+ width: 100%;
+ aspect-ratio: 1 / 1;
+ object-fit: cover;
+ border-radius: 2px;
+ transition: transform 0.4s ease;
 }
 
-/* タイトルとアイコンを小さく */
+.disc-item:hover img {
+ transform: scale(1.05);
+}
+
 .disc-item h3 {
-    font-size: 0.9rem;
-    margin: 15px 0 8px;
-    letter-spacing: 0.05em;
+ font-size: 0.9rem;
+ margin: 15px 0 8px;
+ letter-spacing: 0.05em;
 }
 
-.disc-item .social-links {
-    gap: 15px;
-    font-size: 1.1rem;
-}
 .social-links{
- display:flex;
- justify-content:center;
- gap:20px;
- font-size:1.4rem;
-}
-footer{
- text-align:center;
- padding:60px;
- font-size:.75rem;
- color:var(--sub);
-}
-@media(max-width:768px){
- h1{font-size:2rem}
- .main-emblem{width:320px}
- .live-item{flex-direction:column}
-}
- /* スマホで横にはみ出すのを防ぐ魔法のコード */
-html, body {
-    overflow-x: hidden;
-    width: 100%;
-    margin: 0;
-    padding: 0;
+ display: flex;
+ justify-content: center;
+ gap: 18px;
+ font-size: 1.3rem;
+ margin-top: 10px;
 }
 
-/* ライブ情報のレイアウトをスマホで縦並びに調整 */
-.live-item > div {
-    flex-wrap: wrap !important;
+.social-links a {
+ transition: all 0.3s ease;
+ display: inline-block;
 }
 
-@media (max-width: 600px) {
-    /* フォームの左右の余白を削って画面に収める */
-    #contact {
-        padding: 40px 10px !important;
-    }
-    
-    #contact > div {
-        border-radius: 0 !important; /* スマホでは角丸をなくすとスッキリします */
-    }
-
-    /* ライブ情報の画像とテキストをスマホでは縦に並べる */
-    .live-item > div {
-        flex-direction: column;
-        gap: 10px !important;
-    }
-    
-    .live-item img {
-        width: 100% !important;
-        max-width: 200px;
-        margin: 0 auto;
-        display: block;
-    }
+.social-links a:hover {
+ transform: translateY(-3px) scale(1.1);
+ color: #4b7bec;
 }
-/* --- MOVIEギャラリーの装飾 --- */
+
+/* ===== VIDEO SECTION ===== */
+.video-wrapper{
+ position: relative;
+ padding-bottom: 56.25%;
+ border-radius: 8px;
+ overflow: hidden;
+ box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+ transition: box-shadow 0.3s ease;
+}
+
+.video-wrapper:hover {
+ box-shadow: 0 16px 56px rgba(0,0,0,0.15);
+}
+
+.video-wrapper iframe{
+ position: absolute;
+ inset: 0;
+ width: 100%;
+ height: 100%;
+}
+
 .video-thumbnails {
-    display: flex;
-    gap: 15px;
-    margin-top: 25px;
-    overflow-x: auto;
-    padding: 10px 0 20px;
-    -webkit-overflow-scrolling: touch;
+ display: flex;
+ gap: 15px;
+ margin-top: 30px;
+ overflow-x: auto;
+ padding: 10px 0 20px;
+ -webkit-overflow-scrolling: touch;
 }
 
-/* 各サムネイルの枠 */
+.video-thumbnails::-webkit-scrollbar {
+ height: 3px;
+}
+
+.video-thumbnails::-webkit-scrollbar-thumb {
+ background: #ddd;
+ border-radius: 10px;
+}
+
 .thumb-item {
-    flex: 0 0 160px; /* 横幅を固定 */
-    cursor: pointer;
-    transition: all 0.3s ease;
-    opacity: 0.6; /* 通常時は少し薄くして奥行きを出す */
+ flex: 0 0 160px;
+ cursor: pointer;
+ transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+ opacity: 0.6;
 }
 
 .thumb-item img {
-    width: 100%;
-    border-radius: 2px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
-.thumb-item span {
-    display: block;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    margin-top: 8px;
-    text-align: center;
-    font-family: 'Montserrat', sans-serif;
-    color: var(--text);
-}
-
-/* 選択中のサムネイルを強調 */
-.thumb-item.active {
-    opacity: 1;
-    transform: translateY(-3px);
+ width: 100%;
+ border-radius: 4px;
+ box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+ transition: all 0.3s ease;
 }
 
 .thumb-item:hover {
-    opacity: 1;
+ opacity: 1;
+ transform: translateY(-4px);
 }
 
-/* スクロールバーのデザインをシンプルに */
-.video-thumbnails::-webkit-scrollbar {
-    height: 2px;
+.thumb-item:hover img {
+ box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
-.video-thumbnails::-webkit-scrollbar-thumb {
-    background: #ddd;
+
+.thumb-item.active {
+ opacity: 1;
+ transform: translateY(-3px);
 }
+
+.thumb-item.active img {
+ box-shadow: 0 6px 16px rgba(75, 123, 236, 0.3);
+}
+
+.thumb-item span {
+ display: block;
+ font-size: 10px;
+ letter-spacing: 0.1em;
+ margin-top: 10px;
+ text-align: center;
+ font-family: 'Montserrat', sans-serif;
+ color: var(--text);
+}
+
+/* ===== FOOTER ===== */
+footer{
+ text-align: center;
+ padding: 60px;
+ font-size: 0.75rem;
+ color: var(--sub);
+ background: rgba(0,0,0,0.02);
+}
+
+/* ===== MOBILE RESPONSIVE ===== */
+@media(max-width:768px){
+ h1 { font-size: 2rem; }
+ .main-emblem { width: 320px; }
+ .live-item { flex-direction: column; }
  
-/* --- ナビゲーション最終進化版（HTML構造に最適化） --- */
-nav {
-    width: 100%;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    
-    /* 1. グラスモフィズム（透過とぼかし） */
-    background: rgba(255, 255, 255, 0.4); 
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    
-    /* 2. 横スクロールの設定 */
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    white-space: nowrap; /* 改行を防いで横一列に */
-    display: flex; /* 項目を横に並べる */
-    align-items: center;
-    justify-content: center; /* PCでは中央寄せ */
-}
-
-/* スクロールバーを隠す */
-nav::-webkit-scrollbar { display: none; }
-
-/* 3. メニュー項目（aタグ）の装飾 */
-nav a {
-    display: inline-block;
-    padding: 20px 25px;
-    text-decoration: none;
-    color: #1a1a1a;
-    font-size: 13px;
-    letter-spacing: 0.25em; /* 先鋭的な広い文字間隔 */
-    font-weight: 300;
-    font-family: 'Montserrat', sans-serif;
-    transition: all 0.4s ease;
-    position: relative;
-}
-
-/* 4. スマホ用の調整（余裕とフェード） */
-@media (max-width: 600px) {
-    nav {
-        justify-content: flex-start; /* 左からスライドさせる */
-        /* 左右に大きなフェードアウト効果 */
-        mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
-        -webkit-mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
-    }
-    
-    /* 左端のLIVEの前に大きな余白を作る */
-    nav a:first-child {
-        margin-left: 80px;
-    }
-    
-    /* 右端のCONTACTの後に大きな余白を作る（これで右側のフェードが綺麗に見えます） */
-    nav a:last-child {
-        margin-right: 80px;
-    }
-}
-
-/* ホバー時の有機的な光のライン */
-nav a::after {
-    content: '';
-    position: absolute;
-    bottom: 15px;
-    left: 50%;
-    width: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, #000, transparent);
-    transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-    transform: translateX(-50%);
-    opacity: 0;
-}
-nav a:hover::after {
-    width: 80%;
-    opacity: 1;
-}
-/* --- 中略（既存のコードがある場所） --- */
-/* ディスコグラフィーのサイズを強制的に調整 */
-#disc-list.disc-grid {
-    display: grid !important;
-    /* 150px〜200pxの間で、横に並べる */
-    grid-template-columns: repeat(auto-fit, minmax(150px, 200px)) !important; 
-    justify-content: center; /* 中央寄せ */
-    gap: 20px !important;
-}
-
-#disc-list .disc-item {
-    max-width: 200px; /* 1つのアイテムの最大幅を制限 */
-    margin: 0 auto;
-    padding: 10px !important;
-}
-
-#disc-list .disc-item img {
-    width: 100% !important;
-    height: auto !important;
-    aspect-ratio: 1 / 1 !important;
-}
+ section {
+  padding: 80px 15px;
+ }
  
+ #contact {
+  padding: 40px 10px !important;
+ }
+ 
+ #contact > div {
+  border-radius: 0 !important;
+ }
+ 
+ .live-item > div {
+  flex-direction: column;
+  gap: 10px !important;
+ }
+ 
+ .live-item img {
+  width: 100% !important;
+  max-width: 200px;
+  margin: 0 auto;
+  display: block;
+ }
+}
 </style>
 </head>
 
@@ -384,7 +475,8 @@ nav a:hover::after {
 </nav>
 
 <section id="news">
-  <h2>LIVE</h2> <div id="live-list">
+  <h2>LIVE</h2> 
+  <div id="live-list">
     <p style="text-align:center">Loading...</p>
   </div>
 
@@ -441,24 +533,10 @@ nav a:hover::after {
     </div>
 </section>
 
-<script>
-function changeVideo(id, el) {
-    // 1. メイン動画を切り替え
-    document.getElementById('main-video').src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;
-    
-    // 2. アクティブなサムネイルの見た目を変更
-    document.querySelectorAll('.thumb-item').forEach(item => item.classList.remove('active'));
-    el.classList.add('active');
-    
-    // 3. メイン動画の位置へスムーズにスクロール（スマホ等で便利）
-    document.getElementById('movie').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-</script>
-
 <section id="contact" style="padding: 60px 20px;">
     <h2 style="text-align:center; margin-bottom: 40px;">SNS / CONTACT</h2>
 
-    <div style="max-width: 800px; margin: 0 auto 40px auto; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+    <div style="max-width: 800px; margin: 0 auto 40px auto; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.08);">
         <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfyvVX56s-mFhNuzzUyQMjZlYwQQvwHSKXB4pwIDC91L8CxnQ/viewform?embedded=true" 
             width="100%" 
             height="850" 
@@ -469,7 +547,7 @@ function changeVideo(id, el) {
     </div>
 
     <div style="text-align: center;">
-        <div class="social-links" style="display: flex; justify-content: center; gap: 25px; margin-bottom: 20px; font-size: 24px;">
+        <div class="social-links" style="display: flex; justify-content: center; gap: 25px; margin-bottom: 20px; font-size: 28px;">
             <a href="https://www.youtube.com/@shinoefuhi" target="_blank" style="color: #333;"><i class="fab fa-youtube"></i></a>
             <a href="https://x.com/shinoefuhi" target="_blank" style="color: #333;"><i class="fa-brands fa-x-twitter"></i></a>
             <a href="https://www.instagram.com/shinoefuhi" target="_blank" style="color: #333;"><i class="fab fa-instagram"></i></a>
@@ -485,12 +563,40 @@ function changeVideo(id, el) {
 <script>
 const REPO = "shinoefuhi/shinoefuhi-site";
 
-// 1. ライブ情報の読み込み
+// Scroll Animation Observer
+const observerOptions = {
+ threshold: 0.1,
+ rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+ entries.forEach((entry, index) => {
+  if (entry.isIntersecting) {
+   setTimeout(() => {
+    entry.target.classList.add('visible');
+   }, index * 100);
+  }
+ });
+}, observerOptions);
+
+// Observe all sections
+document.querySelectorAll('section').forEach(section => {
+ observer.observe(section);
+});
+
+// Video change function
+function changeVideo(id, el) {
+    document.getElementById('main-video').src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;
+    document.querySelectorAll('.thumb-item').forEach(item => item.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('movie').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Load Lives
 async function loadLives() {
     const list = document.getElementById("live-list");
     try {
         const res = await fetch(`https://api.github.com/repos/${REPO}/contents/_data/lives`);
-        // フォルダがまだない場合は「予定なし」を表示して次へ
         if (!res.ok) {
             list.innerHTML = "<p style='text-align:center'>現在予定されているライブはありません。</p>";
             return;
@@ -511,42 +617,46 @@ async function loadLives() {
             list.innerHTML = "<p style='text-align:center'>現在予定されているライブはありません。</p>";
         } else {
             list.innerHTML = "";
-            future.forEach(l => {
-    const el = document.createElement("div");
-    el.className = "live-item";
-    
-    // 日付の整形（以前の修正を反映）
-    const d = new Date(l.date);
-    const displayDate = isNaN(d) ? String(l.date) : `${d.getFullYear()}.${('0' + (d.getMonth() + 1)).slice(-2)}.${('0' + d.getDate()).slice(-2)}`;
+            future.forEach((l, idx) => {
+                const el = document.createElement("div");
+                el.className = "live-item";
+                el.style.transitionDelay = `${idx * 0.1}s`;
+                
+                const d = new Date(l.date);
+                const displayDate = isNaN(d) ? String(l.date) : `${d.getFullYear()}.${('0' + (d.getMonth() + 1)).slice(-2)}.${('0' + d.getDate()).slice(-2)}`;
 
-    el.innerHTML = `
-        <div style="display:flex; flex-wrap:wrap; gap:20px; width:100%;">
-            ${l.flyer ? `
-                <div style="flex: 0 0 100px;">
-                    <img src="${l.flyer}" style="width:100%; border-radius:4px; box-shadow:0 2px 8px rgba(0,0,0,0.1); cursor:pointer;" onclick="window.open('${l.flyer}')">
-                </div>
-            ` : ''}
-            
-            <div style="flex: 1; min-width: 200px;">
-                <div class="live-date">${displayDate}</div>
-                <div class="live-info">
-                    <strong>${l.title || ""}</strong><br>
-                    <span style="color:#777">@ ${l.place || ""}</span><br>
-                    <small style="color:#888; font-size:0.85rem;">
-                        ${l.open_time ? 'OPEN ' + l.open_time : ''} ${l.start_time ? '/ START ' + l.start_time : ''}
-                        ${l.price ? '<br>TICKET: ' + l.price : ''}
-                    </small>
-                </div>
-            </div>
+                el.innerHTML = `
+                    <div style="display:flex; flex-wrap:wrap; gap:20px; width:100%;">
+                        ${l.flyer ? `
+                            <div style="flex: 0 0 100px;">
+                                <img src="${l.flyer}" style="width:100%; border-radius:4px; box-shadow:0 2px 8px rgba(0,0,0,0.1); cursor:pointer;" onclick="window.open('${l.flyer}')">
+                            </div>
+                        ` : ''}
+                        
+                        <div style="flex: 1; min-width: 200px;">
+                            <div class="live-date">${displayDate}</div>
+                            <div class="live-info">
+                                <strong>${l.title || ""}</strong><br>
+                                <span style="color:#777">@ ${l.place || ""}</span><br>
+                                <small style="color:#888; font-size:0.85rem;">
+                                    ${l.open_time ? 'OPEN ' + l.open_time : ''} ${l.start_time ? '/ START ' + l.start_time : ''}
+                                    ${l.price ? '<br>TICKET: ' + l.price : ''}
+                                </small>
+                            </div>
+                        </div>
 
-            <div style="display:flex; gap:10px; align-items:center;">
-                ${l.ticketUrl ? `<a href="${l.ticketUrl}" target="_blank" class="btn">TICKET</a>` : ""}
-                ${l.twitterUrl ? `<a href="${l.twitterUrl}" target="_blank" class="btn" style="background:#000;color:#fff;padding:8px 12px;border-radius:4px;"><i class="fa-brands fa-x-twitter"></i></a>` : ""}
-            </div>
-        </div>
-    `;
-    list.appendChild(el);
-});
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            ${l.ticketUrl ? `<a href="${l.ticketUrl}" target="_blank" class="btn">TICKET</a>` : ""}
+                            ${l.twitterUrl ? `<a href="${l.twitterUrl}" target="_blank" class="btn" style="background:#000;color:#fff;padding:8px 12px;border-radius:4px;"><i class="fa-brands fa-x-twitter"></i></a>` : ""}
+                        </div>
+                    </div>
+                `;
+                list.appendChild(el);
+                
+                setTimeout(() => {
+                    el.classList.add('visible');
+                }, idx * 100);
+            });
         }
     } catch (e) {
         console.error(e);
@@ -554,12 +664,12 @@ async function loadLives() {
     }
 }
 
-// 2. Discographyの読み込み
+// Load Discography
 async function loadDiscography() {
     const grid = document.getElementById("disc-list");
     try {
         const res = await fetch(`https://api.github.com/repos/${REPO}/contents/_data/discography`);
-        if (!res.ok) return; // フォルダがない場合は何もしない
+        if (!res.ok) return;
         const files = await res.json();
         const discPromises = files.filter(f => f.name.endsWith('.yml')).map(async (file) => {
             const contentRes = await fetch(file.download_url);
@@ -568,11 +678,12 @@ async function loadDiscography() {
         });
         const discs = await Promise.all(discPromises);
         grid.innerHTML = ""; 
-        discs.forEach(d => {
+        discs.forEach((d, idx) => {
             const el = document.createElement("div");
             el.className = "disc-item";
+            el.style.transitionDelay = `${idx * 0.1}s`;
             el.innerHTML = `
-                <img src="${d.image}" alt="${d.title}" style="width:100%; aspect-ratio:1/1; object-fit:cover;">
+                <img src="${d.image}" alt="${d.title}">
                 <h3>${d.title}</h3>
                 <div class="social-links">
                     ${d.youtube ? `<a href="${d.youtube}" target="_blank"><i class="fab fa-youtube"></i></a>` : ""}
@@ -580,6 +691,10 @@ async function loadDiscography() {
                 </div>
             `;
             grid.appendChild(el);
+            
+            setTimeout(() => {
+                el.classList.add('visible');
+            }, idx * 100);
         });
     } catch (e) {
         console.error(e);

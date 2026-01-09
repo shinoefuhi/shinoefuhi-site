@@ -2,73 +2,502 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shinoefuhi 統合管理画面</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        body { font-family: sans-serif; max-width: 900px; margin: 20px auto; padding: 20px; background: #f4f7f6; color: #2c3e50; }
-        .box { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 30px; }
-        h2 { border-left: 5px solid #2c3e50; padding-left: 15px; margin-bottom: 20px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        label { display: block; margin-top: 10px; font-weight: bold; font-size: 0.9em; }
-        input, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-        button { background: #2c3e50; color: white; border: none; padding: 15px; border-radius: 6px; cursor: pointer; margin-top: 20px; width: 100%; font-size: 16px; font-weight: bold; }
-        button:hover { background: #34495e; }
-        .delete-btn { background: #e74c3c; width: auto; padding: 5px 12px; font-size: 12px; margin-top: 0; }
-        .live-item { border-bottom: 1px solid #eee; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
-        .edit-link { color: #3498db; cursor: pointer; text-decoration: underline; font-size: 0.9em; }
-        #status { position: fixed; top: 20px; right: 20px; padding: 15px 25px; border-radius: 8px; color: white; display: none; z-index: 1000; }
-        .type-badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; color: white; margin-right: 8px; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --primary: #2c3e50;
+            --primary-dark: #1a252f;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --light-bg: #f8fafd;
+            --card-bg: #ffffff;
+            --border: #e1e8ed;
+            --text: #2c3e50;
+            --text-light: #7f8c8d;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f8fafd 0%, #e9f0f5 100%);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            margin-bottom: 40px;
+            color: var(--primary);
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 2px;
+            background: linear-gradient(to right, transparent, var(--secondary), transparent);
+        }
+
+        .box {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideUp 0.5s ease-out forwards;
+        }
+
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .box:nth-child(1) { animation-delay: 0.1s; }
+        .box:nth-child(2) { animation-delay: 0.2s; }
+        .box:nth-child(3) { animation-delay: 0.3s; }
+        .box:nth-child(4) { animation-delay: 0.4s; }
+        .box:nth-child(5) { animation-delay: 0.5s; }
+
+        .box:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px);
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            padding-left: 15px;
+            border-left: 4px solid var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2 i {
+            font-size: 1.1rem;
+            color: var(--secondary);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text);
+            transition: color 0.3s ease;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #fafbfc;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--secondary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
+            transform: translateY(-1px);
+        }
+
+        input[type="password"] {
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.1em;
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(44, 62, 80, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(44, 62, 80, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success) 0%, #229954 100%);
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.2);
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 6px 25px rgba(39, 174, 96, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(149, 165, 166, 0.2);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 6px 25px rgba(149, 165, 166, 0.3);
+        }
+
+        .delete-btn {
+            background: linear-gradient(135deg, var(--danger) 0%, #c0392b 100%);
+            width: auto;
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            margin: 0;
+            box-shadow: 0 2px 8px rgba(231, 76, 60, 0.2);
+        }
+
+        .delete-btn:hover {
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .live-item {
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: slideInLeft 0.4s ease-out forwards;
+        }
+
+        @keyframes slideInLeft {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .live-item:hover {
+            background: #f8fafd;
+            padding-left: 10px;
+            border-radius: 8px;
+        }
+
+        .live-item:last-child {
+            border-bottom: none;
+        }
+
+        .edit-link {
+            color: var(--secondary);
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+
+        .edit-link:hover {
+            background: rgba(52, 152, 219, 0.1);
+            transform: translateY(-1px);
+        }
+
+        #status {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            padding: 16px 28px;
+            border-radius: 12px;
+            color: white;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            animation: slideInRight 0.4s ease-out;
+            font-weight: 600;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .type-badge {
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            color: white;
+            margin-right: 10px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .item-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .item-name {
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .mode-indicator {
+            display: inline-block;
+            padding: 4px 12px;
+            background: linear-gradient(135deg, var(--warning) 0%, #e67e22 100%);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-left: 10px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .field-group {
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .box {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .live-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .item-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-light);
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
     </style>
 </head>
 <body>
+    <div class="container">
+        <h1><i class="fas fa-music"></i> shinoefuhi 統合管理システム</h1>
 
-    <h1>shinoefuhi 統合管理システム</h1>
+        <div class="box">
+            <h2><i class="fas fa-key"></i> 認証</h2>
+            <div class="field-group">
+                <label for="token">GitHub Personal Access Token</label>
+                <input type="password" id="token" placeholder="ghp_...">
+            </div>
+        </div>
 
-    <div class="box">
-        <h2>1. 認証</h2>
-        <input type="password" id="token" placeholder="GitHubトークン (ghp_...)">
-    </div>
+        <div class="box">
+            <h2 id="live-form-title"><i class="fas fa-guitar"></i> ライブ情報の登録/修正</h2>
+            <input type="hidden" id="live-sha">
+            
+            <div class="grid">
+                <div class="field-group">
+                    <label for="live-date">日付</label>
+                    <input type="date" id="live-date">
+                </div>
+                <div class="field-group">
+                    <label for="live-title">タイトル</label>
+                    <input type="text" id="live-title" placeholder="イベント名">
+                </div>
+            </div>
 
-    <div class="box">
-        <h2 id="live-form-title">2. ライブ情報の登録/修正</h2>
-        <input type="hidden" id="live-sha">
-        <div class="grid">
-            <div><label>日付</label><input type="date" id="live-date"></div>
-            <div><label>タイトル</label><input type="text" id="live-title"></div>
-        </div>
-        <div class="grid">
-            <div><label>会場</label><input type="text" id="live-place"></div>
-            <div><label>料金 (例: ¥3,000 +1D)</label><input type="text" id="live-price"></div>
-        </div>
-        <div class="grid">
-            <div><label>OPEN時間</label><input type="time" id="live-open"></div>
-            <div><label>START時間</label><input type="time" id="live-start"></div>
-        </div>
-        <div class="grid">
-            <div><label>チケットURL</label><input type="url" id="live-ticket" placeholder="https://..."></div>
-            <div><label>Twitter/X 告知URL</label><input type="url" id="live-twitter" placeholder="https://x.com/..."></div>
-        </div>
-        <label>フライヤー画像URL (GitHubに上げた写真のURL)</label>
-        <input type="text" id="live-flyer" placeholder="https://raw.githubusercontent.com/...">
-        <button onclick="saveItem('live')">ライブ情報を保存</button>
-        <button onclick="resetForm('live')" style="background:#95a5a6; margin-top:10px;">入力をクリア</button>
-    </div>
+            <div class="grid">
+                <div class="field-group">
+                    <label for="live-place">会場</label>
+                    <input type="text" id="live-place" placeholder="会場名">
+                </div>
+                <div class="field-group">
+                    <label for="live-price">料金</label>
+                    <input type="text" id="live-price" placeholder="¥3,000 +1D">
+                </div>
+            </div>
 
-    <div class="box">
-        <h2 id="disc-form-title">3. Discographyの登録/修正</h2>
-        <input type="hidden" id="disc-sha">
-        <label>作品タイトル</label><input type="text" id="disc-title">
-        <label>画像URL (GitHubに上げた写真のURL)</label><input type="text" id="disc-image">
-        <div class="grid">
-            <div><label>YouTube URL</label><input type="url" id="disc-youtube"></div>
-            <div><label>Spotify URL</label><input type="url" id="disc-spotify"></div>
-        </div>
-        <button onclick="saveItem('disc')" style="background:#27ae60;">作品情報を保存</button>
-        <button onclick="resetForm('disc')" style="background:#95a5a6; margin-top:10px;">入力をクリア</button>
-    </div>
+            <div class="grid">
+                <div class="field-group">
+                    <label for="live-open">OPEN時間</label>
+                    <input type="time" id="live-open">
+                </div>
+                <div class="field-group">
+                    <label for="live-start">START時間</label>
+                    <input type="time" id="live-start">
+                </div>
+            </div>
 
-    <div class="box">
-        <h2>4. 登録済みデータ一覧</h2>
-        <div id="data-list">読み込み中...</div>
+            <div class="grid">
+                <div class="field-group">
+                    <label for="live-ticket">チケットURL</label>
+                    <input type="url" id="live-ticket" placeholder="https://...">
+                </div>
+                <div class="field-group">
+                    <label for="live-twitter">Twitter/X 告知URL</label>
+                    <input type="url" id="live-twitter" placeholder="https://x.com/...">
+                </div>
+            </div>
+
+            <div class="field-group">
+                <label for="live-flyer">フライヤー画像URL</label>
+                <input type="text" id="live-flyer" placeholder="https://raw.githubusercontent.com/...">
+            </div>
+
+            <button onclick="saveItem('live')"><i class="fas fa-save"></i> ライブ情報を保存</button>
+            <button onclick="resetForm('live')" class="btn-secondary"><i class="fas fa-eraser"></i> 入力をクリア</button>
+        </div>
+
+        <div class="box">
+            <h2 id="disc-form-title"><i class="fas fa-compact-disc"></i> Discographyの登録/修正</h2>
+            <input type="hidden" id="disc-sha">
+            
+            <div class="field-group">
+                <label for="disc-title">作品タイトル</label>
+                <input type="text" id="disc-title" placeholder="アルバム/シングル名">
+            </div>
+
+            <div class="field-group">
+                <label for="disc-image">画像URL</label>
+                <input type="text" id="disc-image" placeholder="https://raw.githubusercontent.com/...">
+            </div>
+
+            <div class="grid">
+                <div class="field-group">
+                    <label for="disc-youtube">YouTube URL</label>
+                    <input type="url" id="disc-youtube" placeholder="https://youtube.com/...">
+                </div>
+                <div class="field-group">
+                    <label for="disc-spotify">Spotify URL</label>
+                    <input type="url" id="disc-spotify" placeholder="https://open.spotify.com/...">
+                </div>
+            </div>
+
+            <button onclick="saveItem('disc')" class="btn-success"><i class="fas fa-save"></i> 作品情報を保存</button>
+            <button onclick="resetForm('disc')" class="btn-secondary"><i class="fas fa-eraser"></i> 入力をクリア</button>
+        </div>
+
+        <div class="box">
+            <h2><i class="fas fa-list"></i> 登録済みデータ一覧</h2>
+            <div id="data-list"><div class="loading">データを読み込んでいます</div></div>
+        </div>
     </div>
 
     <div id="status"></div>
@@ -79,45 +508,72 @@
 
         window.onload = () => {
             const savedToken = localStorage.getItem('gh_token');
-            if (savedToken) { tokenInput.value = savedToken; loadAllList(); }
+            if (savedToken) { 
+                tokenInput.value = savedToken; 
+                loadAllList(); 
+            }
         };
 
         async function loadAllList() {
             const listDiv = document.getElementById('data-list');
             const token = tokenInput.value;
-            if (!token) { listDiv.innerHTML = "トークンを入力してください。"; return; }
+            
+            if (!token) { 
+                listDiv.innerHTML = "<p style='text-align:center; color: var(--text-light);'>トークンを入力してください。</p>"; 
+                return; 
+            }
 
             try {
-                const liveRes = await fetch(`https://api.github.com/repos/${REPO}/contents/_data/lives`, { headers: { 'Authorization': `token ${token}` } });
-                const discRes = await fetch(`https://api.github.com/repos/${REPO}/contents/_data/discography`, { headers: { 'Authorization': `token ${token}` } });
+                const liveRes = await fetch(`https://api.github.com/repos/${REPO}/contents/_data/lives`, { 
+                    headers: { 'Authorization': `token ${token}` } 
+                });
+                const discRes = await fetch(`https://api.github.com/repos/${REPO}/contents/_data/discography`, { 
+                    headers: { 'Authorization': `token ${token}` } 
+                });
                 
                 let html = "";
                 if(liveRes.ok) {
                     const lives = await liveRes.json();
-                    lives.forEach(f => html += createListItem(f, 'live', '#3498db'));
+                    lives.forEach((f, idx) => {
+                        html += createListItem(f, 'live', '#3498db', idx);
+                    });
                 }
                 if(discRes.ok) {
                     const discs = await discRes.json();
-                    discs.forEach(f => html += createListItem(f, 'disc', '#27ae60'));
+                    discs.forEach((f, idx) => {
+                        html += createListItem(f, 'disc', '#27ae60', idx);
+                    });
                 }
-                listDiv.innerHTML = html || "データがありません。";
-            } catch (e) { listDiv.innerHTML = "取得エラー"; }
+                listDiv.innerHTML = html || "<p style='text-align:center; color: var(--text-light);'>データがありません。</p>";
+            } catch (e) { 
+                listDiv.innerHTML = "<p style='text-align:center; color: var(--danger);'>取得エラーが発生しました。</p>"; 
+            }
         }
 
-        function createListItem(f, type, color) {
+        function createListItem(f, type, color, idx) {
             const typeName = type === 'live' ? 'LIVE' : 'DISC';
-            return `<div class="live-item">
-                <span><span class="type-badge" style="background:${color}">${typeName}</span> ${f.name}</span>
-                <div>
-                    <span class="edit-link" onclick="prepareEdit('${f.path}', '${f.sha}', '${type}')">修正</span> | 
-                    <button class="delete-btn" onclick="deleteItem('${f.path}', '${f.sha}')">削除</button>
+            const icon = type === 'live' ? 'fa-guitar' : 'fa-compact-disc';
+            return `<div class="live-item" style="animation-delay: ${idx * 0.05}s">
+                <div class="item-info">
+                    <span class="type-badge" style="background:${color}">${typeName}</span>
+                    <span class="item-name"><i class="fas ${icon}"></i> ${f.name}</span>
+                </div>
+                <div class="item-actions">
+                    <span class="edit-link" onclick="prepareEdit('${f.path}', '${f.sha}', '${type}')">
+                        <i class="fas fa-edit"></i> 修正
+                    </span>
+                    <button class="delete-btn" onclick="deleteItem('${f.path}', '${f.sha}')">
+                        <i class="fas fa-trash"></i> 削除
+                    </button>
                 </div>
             </div>`;
         }
 
         async function prepareEdit(path, sha, type) {
             const token = tokenInput.value;
-            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, { headers: { 'Authorization': `token ${token}` } });
+            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, { 
+                headers: { 'Authorization': `token ${token}` } 
+            });
             const data = await res.json();
             const content = decodeURIComponent(escape(atob(data.content)));
             const info = {};
@@ -137,17 +593,16 @@
                 document.getElementById('live-twitter').value = info.twitterUrl || "";
                 document.getElementById('live-flyer').value = info.flyer || "";
                 document.getElementById('live-sha').value = sha;
-                document.getElementById('live-form-title').innerText = "修正モード中";
+                document.getElementById('live-form-title').innerHTML = `<i class="fas fa-guitar"></i> ライブ情報の登録/修正<span class="mode-indicator">修正モード</span>`;
             } else {
                 document.getElementById('disc-title').value = info.title;
                 document.getElementById('disc-image').value = info.image;
                 document.getElementById('disc-youtube').value = info.youtube || "";
                 document.getElementById('disc-spotify').value = info.spotify || "";
-                document.getElementById('live-flyer').value = info.flyer || "";
                 document.getElementById('disc-sha').value = sha;
-                document.getElementById('disc-form-title').innerText = "修正モード中";
+                document.getElementById('disc-form-title').innerHTML = `<i class="fas fa-compact-disc"></i> Discographyの登録/修正<span class="mode-indicator">修正モード</span>`;
             }
-            window.scrollTo(0,0);
+            window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
         async function saveItem(type) {
@@ -161,49 +616,82 @@
                 fileName = `${d}-${t.replace(/\s+/g, '-')}.yml`;
                 path = `_data/lives/${fileName}`;
                 sha = document.getElementById('live-sha').value;
-                yaml = `date: ${d}\ntitle: ${t}
-                \nplace: ${document.getElementById('live-place').value}
-                \nprice: ${document.getElementById('live-price').value}
-                \nopen_time: ${document.getElementById('live-open').value}
-                \nstart_time: ${document.getElementById('live-start').value}
-                \nticketUrl: ${document.getElementById('live-ticket').value}
-                \ntwitterUrl: ${document.getElementById('live-twitter').value}
-                \nflyer: ${document.getElementById('live-flyer').value}`;
+                yaml = `date: ${d}
+title: ${t}
+place: ${document.getElementById('live-place').value}
+price: ${document.getElementById('live-price').value}
+open_time: ${document.getElementById('live-open').value}
+start_time: ${document.getElementById('live-start').value}
+ticketUrl: ${document.getElementById('live-ticket').value}
+twitterUrl: ${document.getElementById('live-twitter').value}
+flyer: ${document.getElementById('live-flyer').value}`;
             } else {
                 const t = document.getElementById('disc-title').value;
                 fileName = `${t.replace(/\s+/g, '-')}.yml`;
                 path = `_data/discography/${fileName}`;
                 sha = document.getElementById('disc-sha').value;
-                yaml = `title: ${t}\nimage: ${document.getElementById('disc-image').value}\nyoutube: ${document.getElementById('disc-youtube').value}\nspotify: ${document.getElementById('disc-spotify').value}`;
+                yaml = `title: ${t}
+image: ${document.getElementById('disc-image').value}
+youtube: ${document.getElementById('disc-youtube').value}
+spotify: ${document.getElementById('disc-spotify').value}`;
             }
 
             const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
                 method: 'PUT',
                 headers: { 'Authorization': `token ${token}` },
-                body: JSON.stringify({ message: `Update ${type}`, content: btoa(unescape(encodeURIComponent(yaml))), sha: sha || undefined })
+                body: JSON.stringify({ 
+                    message: `Update ${type}`, 
+                    content: btoa(unescape(encodeURIComponent(yaml))), 
+                    sha: sha || undefined 
+                })
             });
 
-            if (res.ok) { alert("保存しました！"); resetForm(type); loadAllList(); }
+            if (res.ok) { 
+                showStatus('保存しました！', 'success');
+                resetForm(type); 
+                loadAllList(); 
+            } else {
+                showStatus('保存に失敗しました', 'error');
+            }
         }
 
         async function deleteItem(path, sha) {
-            if (!confirm("消去しますか？")) return;
-            await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+            if (!confirm("本当に削除しますか？")) return;
+            
+            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `token ${tokenInput.value}` },
                 body: JSON.stringify({ message: "Delete", sha: sha })
             });
-            loadAllList();
+
+            if (res.ok) {
+                showStatus('削除しました', 'success');
+                loadAllList();
+            } else {
+                showStatus('削除に失敗しました', 'error');
+            }
         }
 
         function resetForm(type) {
             if(type==='live'){
-                document.querySelectorAll('.box:nth-of-type(2) input').forEach(i => i.value="");
-                document.getElementById('live-form-title').innerText = "2. ライブ情報の登録/修正";
+                document.querySelectorAll('.box:nth-of-type(2) input:not([type="hidden"])').forEach(i => i.value="");
+                document.getElementById('live-form-title').innerHTML = '<i class="fas fa-guitar"></i> ライブ情報の登録/修正';
+                document.getElementById('live-sha').value = "";
             } else {
-                document.querySelectorAll('.box:nth-of-type(3) input').forEach(i => i.value="");
-                document.getElementById('disc-form-title').innerText = "3. Discographyの登録/修正";
+                document.querySelectorAll('.box:nth-of-type(3) input:not([type="hidden"])').forEach(i => i.value="");
+                document.getElementById('disc-form-title').innerHTML = '<i class="fas fa-compact-disc"></i> Discographyの登録/修正';
+                document.getElementById('disc-sha').value = "";
             }
+        }
+
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.style.background = type === 'success' ? 'linear-gradient(135deg, #27ae60 0%, #229954 100%)' : 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)';
+            status.style.display = 'block';
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 3000);
         }
     </script>
 </body>

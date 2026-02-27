@@ -490,6 +490,11 @@
                 </div>
             </div>
 
+            <div class="field-group">
+                <label for="disc-apple">Apple Music URL</label>
+                <input type="url" id="disc-apple" placeholder="https://music.apple.com/...">
+            </div>
+
             <button onclick="saveItem('disc')" class="btn-success"><i class="fas fa-save"></i> 作品情報を保存</button>
             <button onclick="resetForm('disc')" class="btn-secondary"><i class="fas fa-eraser"></i> 入力をクリア</button>
         </div>
@@ -599,6 +604,7 @@
                 document.getElementById('disc-image').value = info.image;
                 document.getElementById('disc-youtube').value = info.youtube || "";
                 document.getElementById('disc-spotify').value = info.spotify || "";
+                document.getElementById('disc-apple').value = info.apple || "";
                 document.getElementById('disc-sha').value = sha;
                 document.getElementById('disc-form-title').innerHTML = `<i class="fas fa-compact-disc"></i> Discographyの登録/修正<span class="mode-indicator">修正モード</span>`;
             }
@@ -633,7 +639,8 @@ flyer: ${document.getElementById('live-flyer').value}`;
                 yaml = `title: ${t}
 image: ${document.getElementById('disc-image').value}
 youtube: ${document.getElementById('disc-youtube').value}
-spotify: ${document.getElementById('disc-spotify').value}`;
+spotify: ${document.getElementById('disc-spotify').value}
+apple: ${document.getElementById('disc-apple').value}`;
             }
 
             const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {

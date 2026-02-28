@@ -686,8 +686,9 @@ async function loadDiscography() {
                 <img src="${d.image}" alt="${d.title}">
                 <h3>${d.title}</h3>
                 <div class="social-links">
-                    ${d.youtube ? `<a href="${d.youtube}" target="_blank"><i class="fab fa-youtube"></i></a>` : ""}
-                    ${d.spotify ? `<a href="${d.spotify}" target="_blank"><i class="fab fa-spotify"></i></a>` : ""}
+                    ${d.youtube ? `<a href="${d.youtube}" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>` : ""}
+                    ${d.spotify ? `<a href="${d.spotify}" target="_blank" title="Spotify"><i class="fab fa-spotify"></i></a>` : ""}
+                    ${d.apple ? `<a href="${d.apple}" target="_blank" title="Apple Music"><i class="fab fa-apple"></i></a>` : ""}
                 </div>
             `;
             grid.appendChild(el);

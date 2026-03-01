@@ -613,52 +613,85 @@
 
         async function saveItem(type) {
             const token = tokenInput.value;
+            if (!token) {
+                showStatus('トークンを入力してください', 'error');
+                return;
+            }
+            
             localStorage.setItem('gh_token', token);
-            let path, yaml, sha, fileName;
+            let path, yaml, sha, fileName, originalPath;
 
             if (type === 'live') {
                 const d = document.getElementById('live-date').value;
                 const t = document.getElementById('live-title').value;
-                fileName = `${d}-${t.replace(/\s+/g, '-')}.yml`;
+                
+                if (!d || !t) {
+                    showStatus('日付とタイトルは必須です', 'error');
+                    return;
+                }
+                
+                // ファイル名に使えない文字を削除・置換
+                const sanitizedTitle = t.replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').toLowerCase();
+                fileName = `${d}-${sanitizedTitle}.yml`;
                 path = `_data/lives/${fileName}`;
                 sha = document.getElementById('live-sha').value;
-                yaml = `date: ${d}
-title: ${t}
-place: ${document.getElementById('live-place').value}
-price: ${document.getElementById('live-price').value}
-open_time: ${document.getElementById('live-open').value}
-start_time: ${document.getElementById('live-start').value}
-ticketUrl: ${document.getElementById('live-ticket').value}
-twitterUrl: ${document.getElementById('live-twitter').value}
-flyer: ${document.getElementById('live-flyer').value}`;
+                
+                yaml = `date: ${d}\n`;
+                yaml += `title: ${t}\n`;
+                yaml += `place: ${document.getElementById('live-place').value}\n`;
+                yaml += `price: ${document.getElementById('live-price').value}\n`;
+                yaml += `open_time: ${document.getElementById('live-open').value}\n`;
+                yaml += `start_time: ${document.getElementById('live-start').value}\n`;
+                yaml += `ticketUrl: ${document.getElementById('live-ticket').value}\n`;
+                yaml += `twitterUrl: ${document.getElementById('live-twitter').value}\n`;
+                yaml += `flyer: ${document.getElementById('live-flyer').value}`;
             } else {
                 const t = document.getElementById('disc-title').value;
-                fileName = `${t.replace(/\s+/g, '-')}.yml`;
+                
+                if (!t) {
+                    showStatus('タイトルは必須です', 'error');
+                    return;
+                }
+                
+                // ファイル名に使えない文字を削除・置換
+                const sanitizedTitle = t.replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').toLowerCase();
+                fileName = `${sanitizedTitle}.yml`;
                 path = `_data/discography/${fileName}`;
                 sha = document.getElementById('disc-sha').value;
-                yaml = `title: ${t}
-image: ${document.getElementById('disc-image').value}
-youtube: ${document.getElementById('disc-youtube').value}
-spotify: ${document.getElementById('disc-spotify').value}
-apple: ${document.getElementById('disc-apple').value}`;
+                
+                yaml = `title: ${t}\n`;
+                yaml += `image: ${document.getElementById('disc-image').value}\n`;
+                yaml += `youtube: ${document.getElementById('disc-youtube').value}\n`;
+                yaml += `spotify: ${document.getElementById('disc-spotify').value}\n`;
+                yaml += `apple: ${document.getElementById('disc-apple').value}`;
             }
 
-            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
-                method: 'PUT',
-                headers: { 'Authorization': `token ${token}` },
-                body: JSON.stringify({ 
-                    message: `Update ${type}`, 
-                    content: btoa(unescape(encodeURIComponent(yaml))), 
-                    sha: sha || undefined 
-                })
-            });
+            try {
+                const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Authorization': `token ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        message: `Update ${type}: ${fileName}`, 
+                        content: btoa(unescape(encodeURIComponent(yaml))), 
+                        sha: sha || undefined 
+                    })
+                });
 
-            if (res.ok) { 
-                showStatus('保存しました！', 'success');
-                resetForm(type); 
-                loadAllList(); 
-            } else {
-                showStatus('保存に失敗しました', 'error');
+                if (res.ok) { 
+                    showStatus('保存しました！', 'success');
+                    resetForm(type); 
+                    setTimeout(() => loadAllList(), 500);
+                } else {
+                    const errorData = await res.json();
+                    console.error('Save error:', errorData);
+                    showStatus(`保存に失敗しました: ${errorData.message || '不明なエラー'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Network error:', error);
+                showStatus('ネットワークエラーが発生しました', 'error');
             }
         }
 

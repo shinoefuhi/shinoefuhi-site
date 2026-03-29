@@ -378,6 +378,63 @@
             }
         }
 
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            background: #fafbfc;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .upload-area:hover {
+            border-color: var(--secondary);
+            background: #f0f7ff;
+        }
+
+        .upload-area.dragover {
+            border-color: var(--success);
+            background: #f0fff4;
+        }
+
+        .upload-area input[type="file"] {
+            display: none;
+        }
+
+        .upload-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .upload-label i {
+            font-size: 2rem;
+            color: var(--secondary);
+        }
+
+        .preview-image {
+            max-width: 200px;
+            max-height: 200px;
+            margin: 15px auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .preview-image.show {
+            display: block;
+        }
+
+        .upload-status {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 10px;
+        }
+
         .loading {
             text-align: center;
             padding: 20px;
@@ -457,8 +514,21 @@
             </div>
 
             <div class="field-group">
-                <label for="live-flyer">フライヤー画像URL</label>
-                <input type="text" id="live-flyer" placeholder="https://raw.githubusercontent.com/...">
+                <label for="live-flyer">フライヤー画像</label>
+                <div class="upload-area" onclick="document.getElementById('flyer-upload').click()" 
+                     ondragover="event.preventDefault(); this.classList.add('dragover')" 
+                     ondragleave="this.classList.remove('dragover')"
+                     ondrop="handleDrop(event, 'flyer')">
+                    <input type="file" id="flyer-upload" accept="image/*" onchange="handleFileSelect(event, 'flyer')">
+                    <label class="upload-label">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>画像をドラッグ＆ドロップ または クリックして選択</span>
+                        <small style="color: var(--text-light);">推奨: 1080x1080px 以上</small>
+                    </label>
+                </div>
+                <img id="flyer-preview" class="preview-image" alt="Preview">
+                <div id="flyer-status" class="upload-status"></div>
+                <input type="text" id="live-flyer" placeholder="または直接URLを入力" style="margin-top: 10px;">
             </div>
 
             <button onclick="saveItem('live')"><i class="fas fa-save"></i> ライブ情報を保存</button>
@@ -475,8 +545,21 @@
             </div>
 
             <div class="field-group">
-                <label for="disc-image">画像URL</label>
-                <input type="text" id="disc-image" placeholder="https://raw.githubusercontent.com/...">
+                <label for="disc-image">ジャケット画像</label>
+                <div class="upload-area" onclick="document.getElementById('jacket-upload').click()"
+                     ondragover="event.preventDefault(); this.classList.add('dragover')" 
+                     ondragleave="this.classList.remove('dragover')"
+                     ondrop="handleDrop(event, 'jacket')">
+                    <input type="file" id="jacket-upload" accept="image/*" onchange="handleFileSelect(event, 'jacket')">
+                    <label class="upload-label">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>画像をドラッグ＆ドロップ または クリックして選択</span>
+                        <small style="color: var(--text-light);">推奨: 正方形 1000x1000px 以上</small>
+                    </label>
+                </div>
+                <img id="jacket-preview" class="preview-image" alt="Preview">
+                <div id="jacket-status" class="upload-status"></div>
+                <input type="text" id="disc-image" placeholder="または直接URLを入力" style="margin-top: 10px;">
             </div>
 
             <div class="grid">
@@ -510,6 +593,101 @@
     <script>
         const REPO = "shinoefuhi/shinoefuhi-site";
         const tokenInput = document.getElementById('token');
+
+        // 画像アップロード処理
+        async function handleFileSelect(event, type) {
+            const file = event.target.files[0];
+            if (file) {
+                await uploadImage(file, type);
+            }
+        }
+
+        function handleDrop(event, type) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('dragover');
+            const file = event.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                uploadImage(file, type);
+            }
+        }
+
+        async function uploadImage(file, type) {
+            const token = tokenInput.value;
+            if (!token) {
+                showStatus('先にトークンを入力してください', 'error');
+                return;
+            }
+
+            // プレビュー表示
+            const reader = new FileReader();
+            const previewId = type === 'flyer' ? 'flyer-preview' : 'jacket-preview';
+            const statusId = type === 'flyer' ? 'flyer-status' : 'jacket-status';
+            const inputId = type === 'flyer' ? 'live-flyer' : 'disc-image';
+            
+            reader.onload = (e) => {
+                const preview = document.getElementById(previewId);
+                preview.src = e.target.result;
+                preview.classList.add('show');
+            };
+            reader.readAsDataURL(file);
+
+            // ステータス表示
+            const statusDiv = document.getElementById(statusId);
+            statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> アップロード中...';
+
+            // ファイル名を生成（タイムスタンプ + オリジナル名）
+            const timestamp = new Date().getTime();
+            const sanitizedName = file.name.replace(/[^\w.-]/g, '_');
+            const fileName = `${timestamp}-${sanitizedName}`;
+            
+            // フォルダパスを決定
+            const folder = type === 'flyer' ? 'images/flyers' : 'images/jackets';
+            const path = `${folder}/${fileName}`;
+
+            try {
+                // ファイルをBase64に変換
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        const base64String = reader.result.split(',')[1];
+                        resolve(base64String);
+                    };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+
+                // GitHubにアップロード
+                const response = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: `Upload ${type}: ${fileName}`,
+                        content: base64
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    // raw.githubusercontent.comのURLを生成
+                    const rawUrl = `https://raw.githubusercontent.com/${REPO}/main/${path}`;
+                    
+                    // URLをinputに設定
+                    document.getElementById(inputId).value = rawUrl;
+                    
+                    statusDiv.innerHTML = '<i class="fas fa-check-circle" style="color: var(--success)"></i> アップロード完了！';
+                    showStatus('画像をアップロードしました', 'success');
+                } else {
+                    throw new Error('Upload failed');
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                statusDiv.innerHTML = '<i class="fas fa-exclamation-circle" style="color: var(--danger)"></i> アップロード失敗';
+                showStatus('画像のアップロードに失敗しました', 'error');
+            }
+        }
 
         window.onload = () => {
             const savedToken = localStorage.getItem('gh_token');
@@ -714,13 +892,17 @@
 
         function resetForm(type) {
             if(type==='live'){
-                document.querySelectorAll('.box:nth-of-type(2) input:not([type="hidden"])').forEach(i => i.value="");
+                document.querySelectorAll('.box:nth-of-type(2) input:not([type="hidden"]):not([type="file"])').forEach(i => i.value="");
                 document.getElementById('live-form-title').innerHTML = '<i class="fas fa-guitar"></i> ライブ情報の登録/修正';
                 document.getElementById('live-sha').value = "";
+                document.getElementById('flyer-preview').classList.remove('show');
+                document.getElementById('flyer-status').innerHTML = "";
             } else {
-                document.querySelectorAll('.box:nth-of-type(3) input:not([type="hidden"])').forEach(i => i.value="");
+                document.querySelectorAll('.box:nth-of-type(3) input:not([type="hidden"]):not([type="file"])').forEach(i => i.value="");
                 document.getElementById('disc-form-title').innerHTML = '<i class="fas fa-compact-disc"></i> Discographyの登録/修正';
                 document.getElementById('disc-sha').value = "";
+                document.getElementById('jacket-preview').classList.remove('show');
+                document.getElementById('jacket-status').innerHTML = "";
             }
         }
 

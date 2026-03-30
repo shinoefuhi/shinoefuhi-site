@@ -468,6 +468,7 @@
         <div class="box">
             <h2 id="live-form-title"><i class="fas fa-guitar"></i> ライブ情報の登録/修正</h2>
             <input type="hidden" id="live-sha">
+            <input type="hidden" id="live-original-path">
             
             <div class="grid">
                 <div class="field-group">
@@ -538,6 +539,7 @@
         <div class="box">
             <h2 id="disc-form-title"><i class="fas fa-compact-disc"></i> Discographyの登録/修正</h2>
             <input type="hidden" id="disc-sha">
+            <input type="hidden" id="disc-original-path">
             
             <div class="field-group">
                 <label for="disc-title">作品タイトル</label>
@@ -776,6 +778,8 @@
                 document.getElementById('live-twitter').value = info.twitterUrl || "";
                 document.getElementById('live-flyer').value = info.flyer || "";
                 document.getElementById('live-sha').value = sha;
+                // 元のファイルパスを保存
+                document.getElementById('live-original-path').value = path;
                 document.getElementById('live-form-title').innerHTML = `<i class="fas fa-guitar"></i> ライブ情報の登録/修正<span class="mode-indicator">修正モード</span>`;
             } else {
                 document.getElementById('disc-title').value = info.title;
@@ -784,6 +788,8 @@
                 document.getElementById('disc-spotify').value = info.spotify || "";
                 document.getElementById('disc-apple').value = info.apple || "";
                 document.getElementById('disc-sha').value = sha;
+                // 元のファイルパスを保存
+                document.getElementById('disc-original-path').value = path;
                 document.getElementById('disc-form-title').innerHTML = `<i class="fas fa-compact-disc"></i> Discographyの登録/修正<span class="mode-indicator">修正モード</span>`;
             }
             window.scrollTo({top: 0, behavior: 'smooth'});
@@ -895,12 +901,14 @@
                 document.querySelectorAll('.box:nth-of-type(2) input:not([type="hidden"]):not([type="file"])').forEach(i => i.value="");
                 document.getElementById('live-form-title').innerHTML = '<i class="fas fa-guitar"></i> ライブ情報の登録/修正';
                 document.getElementById('live-sha').value = "";
+                document.getElementById('live-original-path').value = "";
                 document.getElementById('flyer-preview').classList.remove('show');
                 document.getElementById('flyer-status').innerHTML = "";
             } else {
                 document.querySelectorAll('.box:nth-of-type(3) input:not([type="hidden"]):not([type="file"])').forEach(i => i.value="");
                 document.getElementById('disc-form-title').innerHTML = '<i class="fas fa-compact-disc"></i> Discographyの登録/修正';
                 document.getElementById('disc-sha').value = "";
+                document.getElementById('disc-original-path').value = "";
                 document.getElementById('jacket-preview').classList.remove('show');
                 document.getElementById('jacket-status').innerHTML = "";
             }

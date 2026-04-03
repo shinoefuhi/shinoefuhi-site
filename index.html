@@ -3,8 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>shinoefuhi Official Website</title>
 <meta name="description" content="shinoefuhi official website. Live schedule, discography, movie and contact.">
+
 <!-- OGP -->
 <meta property="og:title" content="shinoefuhi Official Website">
 <meta property="og:description" content="Live / Discography / Movie">
@@ -12,10 +14,13 @@
 <meta property="og:url" content="https://shinoefuhi.com/">
 <meta property="og:image" content="https://shinoefuhi.com/ogp.jpg">
 <meta name="twitter:card" content="summary_large_image">
+
 <link rel="canonical" href="https://shinoefuhi.com/">
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;600&family=Montserrat:wght@300;600&display=swap">
 <script src="https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js"></script>
+
 <style>
 :root{
  --bg:#f8fafd;
@@ -24,13 +29,16 @@
  --accent:#fdfd96;
  --shadow: rgba(0, 0, 0, 0.08);
 }
+
 * {
  box-sizing: border-box;
 }
+
 html{
  scroll-behavior:smooth;
  overflow-x: hidden;
 }
+
 body{
  margin:0;
  background:var(--bg);
@@ -39,10 +47,12 @@ body{
  line-height:1.8;
  overflow-x: hidden;
 }
+
 a{
  text-decoration:none;
  color:inherit;
 }
+
 /* ===== HERO SECTION ===== */
 header{
  height:100vh;
@@ -52,24 +62,28 @@ header{
  position:relative;
  overflow:hidden;
 }
+
 .hero-bg{
  position:absolute;
  inset:0;
- background:url('images/hero/artist-photo.jpg') center/cover no-repeat;
+ background:url('artist-photo.jpg') center/cover no-repeat;
  filter:brightness(.7);
  transform:scale(1);
  z-index:-1;
  animation: heroZoom 20s ease-in-out infinite alternate;
 }
+
 @keyframes heroZoom {
  0% { transform: scale(1); }
  100% { transform: scale(1.08); }
 }
+
 .hero-content{
  text-align:center;
  color:#fff;
  animation: fadeInUp 1.2s ease-out;
 }
+
 @keyframes fadeInUp {
  from {
   opacity: 0;
@@ -80,15 +94,18 @@ header{
   transform: translateY(0);
  }
 }
+
 .main-emblem{
  width:400px;
  animation: float 6s ease-in-out infinite;
  filter: drop-shadow(0 10px 30px rgba(0,0,0,0.4));
 }
+
 @keyframes float{
  0%, 100% { transform: translateY(0); }
  50% { transform: translateY(-12px); }
 }
+
 h1{
  font-family:'Montserrat',sans-serif;
  font-weight:300;
@@ -96,6 +113,7 @@ h1{
  margin-top: 20px;
  text-shadow: 0 4px 20px rgba(0,0,0,0.3);
 }
+
 /* ===== NAVIGATION ===== */
 nav {
  width: 100%;
@@ -115,7 +133,9 @@ nav {
  box-shadow: 0 2px 20px rgba(0,0,0,0.03);
  transition: all 0.3s ease;
 }
+
 nav::-webkit-scrollbar { display: none; }
+
 nav a {
  display: inline-block;
  padding: 22px 28px;
@@ -128,6 +148,7 @@ nav a {
  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
  position: relative;
 }
+
 nav a::after {
  content: '';
  position: absolute;
@@ -140,13 +161,16 @@ nav a::after {
  transform: translateX(-50%);
  opacity: 0;
 }
+
 nav a:hover::after {
  width: 80%;
  opacity: 1;
 }
+
 nav a:hover {
  color: #4b7bec;
 }
+
 @media (max-width: 600px) {
  nav {
   justify-content: flex-start;
@@ -157,6 +181,7 @@ nav a:hover {
  nav a:first-child { margin-left: 80px; }
  nav a:last-child { margin-right: 80px; }
 }
+
 /* ===== SECTIONS ===== */
 section{
  padding: 110px 20px;
@@ -166,10 +191,12 @@ section{
  transform: translateY(40px);
  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
 }
+
 section.visible {
  opacity: 1;
  transform: translateY(0);
 }
+
 h2{
  text-align: center;
  font-family: 'Montserrat', sans-serif;
@@ -179,6 +206,7 @@ h2{
  position: relative;
  padding-bottom: 20px;
 }
+
 h2::after {
  content: '';
  position: absolute;
@@ -189,6 +217,7 @@ h2::after {
  height: 1px;
  background: linear-gradient(to right, transparent, var(--accent), transparent);
 }
+
 /* ===== LIVE ITEMS ===== */
 .live-item{
  background: #fff;
@@ -204,20 +233,24 @@ h2::after {
  opacity: 0;
  transform: translateX(-30px);
 }
+
 .live-item.visible {
  opacity: 1;
  transform: translateX(0);
 }
+
 .live-item:hover {
  transform: translateY(-4px);
  box-shadow: 0 12px 36px rgba(0,0,0,0.12);
 }
+
 .live-date{
  min-width: 140px;
  font-family: 'Montserrat', sans-serif;
  font-weight: 600;
  color: var(--text);
 }
+
 .btn{
  border: 1px solid var(--text);
  padding: 10px 24px;
@@ -226,12 +259,14 @@ h2::after {
  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
  display: inline-block;
 }
+
 .btn:hover {
  background: var(--text);
  color: #fff;
  transform: translateY(-2px);
  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
 }
+
 /* ===== DISCOGRAPHY ===== */
 .disc-grid {
  display: grid;
@@ -240,6 +275,7 @@ h2::after {
  gap: 30px;
  margin-top: 40px;
 }
+
 .disc-item {
  background: #fff;
  padding: 15px;
@@ -250,14 +286,17 @@ h2::after {
  opacity: 0;
  transform: scale(0.9);
 }
+
 .disc-item.visible {
  opacity: 1;
  transform: scale(1);
 }
+
 .disc-item:hover {
  transform: translateY(-8px) scale(1.02);
  box-shadow: 8px 12px 0 rgba(253, 253, 150, 0.5);
 }
+
 .disc-item img {
  width: 100%;
  aspect-ratio: 1 / 1;
@@ -265,14 +304,17 @@ h2::after {
  border-radius: 2px;
  transition: transform 0.4s ease;
 }
+
 .disc-item:hover img {
  transform: scale(1.05);
 }
+
 .disc-item h3 {
  font-size: 0.9rem;
  margin: 15px 0 8px;
  letter-spacing: 0.05em;
 }
+
 .social-links{
  display: flex;
  justify-content: center;
@@ -280,14 +322,17 @@ h2::after {
  font-size: 1.3rem;
  margin-top: 10px;
 }
+
 .social-links a {
  transition: all 0.3s ease;
  display: inline-block;
 }
+
 .social-links a:hover {
  transform: translateY(-3px) scale(1.1);
  color: #4b7bec;
 }
+
 /* ===== VIDEO SECTION ===== */
 .video-wrapper{
  position: relative;
@@ -297,15 +342,18 @@ h2::after {
  box-shadow: 0 12px 40px rgba(0,0,0,0.1);
  transition: box-shadow 0.3s ease;
 }
+
 .video-wrapper:hover {
  box-shadow: 0 16px 56px rgba(0,0,0,0.15);
 }
+
 .video-wrapper iframe{
  position: absolute;
  inset: 0;
  width: 100%;
  height: 100%;
 }
+
 .video-thumbnails {
  display: flex;
  gap: 15px;
@@ -314,39 +362,48 @@ h2::after {
  padding: 10px 0 20px;
  -webkit-overflow-scrolling: touch;
 }
+
 .video-thumbnails::-webkit-scrollbar {
  height: 3px;
 }
+
 .video-thumbnails::-webkit-scrollbar-thumb {
  background: #ddd;
  border-radius: 10px;
 }
+
 .thumb-item {
  flex: 0 0 160px;
  cursor: pointer;
  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
  opacity: 0.6;
 }
+
 .thumb-item img {
  width: 100%;
  border-radius: 4px;
  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
  transition: all 0.3s ease;
 }
+
 .thumb-item:hover {
  opacity: 1;
  transform: translateY(-4px);
 }
+
 .thumb-item:hover img {
  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
+
 .thumb-item.active {
  opacity: 1;
  transform: translateY(-3px);
 }
+
 .thumb-item.active img {
  box-shadow: 0 6px 16px rgba(75, 123, 236, 0.3);
 }
+
 .thumb-item span {
  display: block;
  font-size: 10px;
@@ -356,6 +413,7 @@ h2::after {
  font-family: 'Montserrat', sans-serif;
  color: var(--text);
 }
+
 /* ===== FOOTER ===== */
 footer{
  text-align: center;
@@ -364,6 +422,7 @@ footer{
  color: var(--sub);
  background: rgba(0,0,0,0.02);
 }
+
 /* ===== MOBILE RESPONSIVE ===== */
 @media(max-width:768px){
  h1 { font-size: 2rem; }
@@ -396,14 +455,17 @@ footer{
 }
 </style>
 </head>
+
 <body>
+
 <header>
 <div class="hero-bg" id="hero-bg"></div>
 <div class="hero-content">
-<img src="images/logo/emblem.png" alt="shinoefuhi emblem" class="main-emblem">
+<img src="emblem.png" alt="shinoefuhi emblem" class="main-emblem">
 <h1>shinoefuhi</h1>
 </div>
 </header>
+
 <nav aria-label="Main Navigation">
 <a href="#news">LIVE</a>
 <a href="archive.html">ARCHIVE</a>
@@ -411,19 +473,23 @@ footer{
 <a href="#movie">MOVIE</a>
 <a href="#contact">CONTACT</a>
 </nav>
+
 <section id="news">
   <h2>LIVE</h2> 
   <div id="live-list">
     <p style="text-align:center">Loading...</p>
   </div>
+
   <div style="text-align:right; margin-top:20px;">
     <a href="archive.html" class="btn">VIEW ARCHIVE <i class="fa-solid fa-arrow-right"></i></a>
   </div>
 </section>
+
 <section id="discography">
 <h2>DISCOGRAPHY</h2>
 <div id="disc-list" class="disc-grid"></div>
 </section>
+
 <section id="movie">
     <h2>MOVIE</h2>
     
@@ -434,6 +500,7 @@ footer{
             allowfullscreen>
         </iframe>
     </div>
+
     <div class="video-thumbnails">
         <div class="thumb-item active" onclick="changeVideo('URuOQ6ymR_Y', this)">
             <img src="https://img.youtube.com/vi/URuOQ6ymR_Y/mqdefault.jpg" alt="Landscape">
@@ -465,8 +532,10 @@ footer{
         </div>
     </div>
 </section>
+
 <section id="contact" style="padding: 60px 20px;">
     <h2 style="text-align:center; margin-bottom: 40px;">SNS / CONTACT</h2>
+
     <div style="max-width: 800px; margin: 0 auto 40px auto; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.08);">
         <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfyvVX56s-mFhNuzzUyQMjZlYwQQvwHSKXB4pwIDC91L8CxnQ/viewform?embedded=true" 
             width="100%" 
@@ -476,6 +545,7 @@ footer{
             marginwidth="0"
             style="display: block;">読み込んでいます…</iframe>
     </div>
+
     <div style="text-align: center;">
         <div class="social-links" style="display: flex; justify-content: center; gap: 25px; margin-bottom: 20px; font-size: 28px;">
             <a href="https://www.youtube.com/@shinoefuhi" target="_blank" style="color: #333;"><i class="fab fa-youtube"></i></a>
@@ -487,14 +557,18 @@ footer{
         </p>
     </div>
 </section>
+
 <footer>&copy; 2026 shinoefuhi.</footer>
+
 <script>
 const REPO = "shinoefuhi/shinoefuhi-site";
+
 // Scroll Animation Observer
 const observerOptions = {
  threshold: 0.1,
  rootMargin: '0px 0px -50px 0px'
 };
+
 const observer = new IntersectionObserver((entries) => {
  entries.forEach((entry, index) => {
   if (entry.isIntersecting) {
@@ -504,10 +578,12 @@ const observer = new IntersectionObserver((entries) => {
   }
  });
 }, observerOptions);
+
 // Observe all sections
 document.querySelectorAll('section').forEach(section => {
  observer.observe(section);
 });
+
 // Video change function
 function changeVideo(id, el) {
     document.getElementById('main-video').src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;
@@ -515,6 +591,7 @@ function changeVideo(id, el) {
     el.classList.add('active');
     document.getElementById('movie').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
+
 // Load Lives
 async function loadLives() {
     const list = document.getElementById("live-list");
@@ -530,10 +607,12 @@ async function loadLives() {
             const yamlText = await contentRes.text();
             return jsyaml.load(yamlText);
         });
+
         const lives = await Promise.all(livePromises);
         lives.sort((a, b) => new Date(a.date) - new Date(b.date));
         const today = new Date().setHours(0, 0, 0, 0);
         const future = lives.filter(l => new Date(l.date) >= today);
+
         if (!future.length) {
             list.innerHTML = "<p style='text-align:center'>現在予定されているライブはありません。</p>";
         } else {
@@ -545,6 +624,7 @@ async function loadLives() {
                 
                 const d = new Date(l.date);
                 const displayDate = isNaN(d) ? String(l.date) : `${d.getFullYear()}.${('0' + (d.getMonth() + 1)).slice(-2)}.${('0' + d.getDate()).slice(-2)}`;
+
                 el.innerHTML = `
                     <div style="display:flex; flex-wrap:wrap; gap:20px; width:100%;">
                         ${l.flyer ? `
@@ -564,6 +644,7 @@ async function loadLives() {
                                 </small>
                             </div>
                         </div>
+
                         <div style="display:flex; gap:10px; align-items:center;">
                             ${l.ticketUrl ? `<a href="${l.ticketUrl}" target="_blank" class="btn">TICKET</a>` : ""}
                             ${l.twitterUrl ? `<a href="${l.twitterUrl}" target="_blank" class="btn" style="background:#000;color:#fff;padding:8px 12px;border-radius:4px;"><i class="fa-brands fa-x-twitter"></i></a>` : ""}
@@ -582,6 +663,7 @@ async function loadLives() {
         list.innerHTML = "<p style='text-align:center'>ライブ情報の取得に失敗しました。</p>";
     }
 }
+
 // Load Discography
 async function loadDiscography() {
     const grid = document.getElementById("disc-list");
@@ -619,6 +701,7 @@ async function loadDiscography() {
         console.error(e);
     }
 }
+
 loadLives();
 loadDiscography();
 </script>

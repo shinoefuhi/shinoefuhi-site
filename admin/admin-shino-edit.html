@@ -803,7 +803,7 @@
             }
             
             localStorage.setItem('gh_token', token);
-            let path, yaml, sha, originalPath;
+            let newPath, yaml, sha, originalPath;
 
             if (type === 'live') {
                 const d = document.getElementById('live-date').value;
@@ -817,15 +817,9 @@
                 sha = document.getElementById('live-sha').value;
                 originalPath = document.getElementById('live-original-path').value;
                 
-                // 【修正ポイント】既存データなら元のパスを維持、新規なら日本語を保持して作成
-                if (sha && originalPath) {
-                    path = originalPath;
-                } else {
-                    // 記号だけアンダースコアに変換し、日本語は残す
-                    const safeTitle = t.replace(/[\/\\:*?"<>|\s]/g, '_');
-                    const timestamp = new Date().getTime(); // 同名ファイルの上書きエラーを防止
-                    path = `_data/lives/${d}-${safeTitle}-${timestamp}.yml`;
-                }
+                // 記号を排除し、日本語を保持して新しいファイル名を生成
+                const safeTitle = t.replace(/[\/\\:*?"<>|\s]/g, '_');
+                newPath = `_data/lives/${d}-${safeTitle}.yml`;
                 
                 yaml = `date: ${d}\n`;
                 yaml += `title: ${t}\n`;
@@ -847,14 +841,9 @@
                 sha = document.getElementById('disc-sha').value;
                 originalPath = document.getElementById('disc-original-path').value;
                 
-                // 【修正ポイント】既存データなら元のパスを維持、新規なら日本語を保持して作成
-                if (sha && originalPath) {
-                    path = originalPath;
-                } else {
-                    const safeTitle = t.replace(/[\/\\:*?"<>|\s]/g, '_') || 'untitled';
-                    const timestamp = new Date().getTime();
-                    path = `_data/discography/${safeTitle}-${timestamp}.yml`;
-                }
+                // 記号を排除し、日本語を保持して新しいファイル名を生成
+                const safeTitle = t.replace(/[\/\\:*?"<>|\s]/g, '_') || 'untitled';
+                newPath = `_data/discography/${safeTitle}.yml`;
                 
                 yaml = `title: ${t}\n`;
                 yaml += `image: ${document.getElementById('disc-image').value}\n`;
@@ -864,31 +853,60 @@
             }
 
             try {
-                const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+                // ファイル名（パス）が変更されたかどうかをチェック
+                const isRename = (sha && originalPath && originalPath !== newPath);
+
+                const putBody = { 
+                    message: isRename ? `Rename and update ${type}: ${newPath}` : `Update ${type}: ${newPath}`, 
+                    content: btoa(unescape(encodeURIComponent(yaml)))
+                };
+
+                // 名前が変わっていない（単なる内容の上書き）の場合は、元の鍵(sha)を含める
+                if (!isRename && sha) {
+                    putBody.sha = sha;
+                }
+
+                // 1. 新しい内容・新しい名前で保存（作成）する
+                const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${newPath}`, {
                     method: 'PUT',
                     headers: { 
                         'Authorization': `token ${token}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ 
-                        message: `Update ${type} data`, 
-                        content: btoa(unescape(encodeURIComponent(yaml))), 
-                        sha: sha || undefined 
-                    })
+                    body: JSON.stringify(putBody)
                 });
 
-                if (res.ok) { 
-                    showStatus('保存しました！', 'success');
-                    resetForm(type); 
-                    setTimeout(() => loadAllList(), 500);
-                } else {
+                if (!res.ok) {
                     const errorData = await res.json();
-                    console.error('Save error:', errorData);
-                    showStatus(`保存に失敗しました: ${errorData.message || '不明なエラー'}`, 'error');
+                    throw new Error(errorData.message || '保存に失敗しました');
                 }
+
+                // 2. リネーム（ファイル名変更）の場合は、古いファイルを削除する
+                if (isRename) {
+                    const delRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${originalPath}`, {
+                        method: 'DELETE',
+                        headers: { 
+                            'Authorization': `token ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: `Delete old file after rename: ${originalPath}`,
+                            sha: sha
+                        })
+                    });
+                    
+                    if (!delRes.ok) {
+                        console.warn('古いファイルの削除に失敗しました（新しいファイルは作成されています）');
+                    }
+                }
+
+                showStatus('保存しました！', 'success');
+                resetForm(type); 
+                setTimeout(() => loadAllList(), 500);
+
             } catch (error) {
-                console.error('Network error:', error);
-                showStatus('ネットワークエラーが発生しました', 'error');
+                console.error('Save error:', error);
+                showStatus(`エラー: ${error.message}`, 'error');
             }
         }
 

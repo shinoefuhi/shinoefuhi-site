@@ -803,7 +803,7 @@
             }
             
             localStorage.setItem('gh_token', token);
-            let path, yaml, sha, fileName, originalPath;
+            let path, yaml, sha, originalPath;
 
             if (type === 'live') {
                 const d = document.getElementById('live-date').value;
@@ -814,11 +814,18 @@
                     return;
                 }
                 
-                // ファイル名に使えない文字を削除・置換
-                const sanitizedTitle = t.replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').toLowerCase();
-                fileName = `${d}-${sanitizedTitle}.yml`;
-                path = `_data/lives/${fileName}`;
                 sha = document.getElementById('live-sha').value;
+                originalPath = document.getElementById('live-original-path').value;
+                
+                // 【修正ポイント】既存データなら元のパスを維持、新規なら日本語を保持して作成
+                if (sha && originalPath) {
+                    path = originalPath;
+                } else {
+                    // 記号だけアンダースコアに変換し、日本語は残す
+                    const safeTitle = t.replace(/[\/\\:*?"<>|\s]/g, '_');
+                    const timestamp = new Date().getTime(); // 同名ファイルの上書きエラーを防止
+                    path = `_data/lives/${d}-${safeTitle}-${timestamp}.yml`;
+                }
                 
                 yaml = `date: ${d}\n`;
                 yaml += `title: ${t}\n`;
@@ -837,11 +844,17 @@
                     return;
                 }
                 
-                // ファイル名に使えない文字を削除・置換
-                const sanitizedTitle = t.replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').toLowerCase();
-                fileName = `${sanitizedTitle}.yml`;
-                path = `_data/discography/${fileName}`;
                 sha = document.getElementById('disc-sha').value;
+                originalPath = document.getElementById('disc-original-path').value;
+                
+                // 【修正ポイント】既存データなら元のパスを維持、新規なら日本語を保持して作成
+                if (sha && originalPath) {
+                    path = originalPath;
+                } else {
+                    const safeTitle = t.replace(/[\/\\:*?"<>|\s]/g, '_') || 'untitled';
+                    const timestamp = new Date().getTime();
+                    path = `_data/discography/${safeTitle}-${timestamp}.yml`;
+                }
                 
                 yaml = `title: ${t}\n`;
                 yaml += `image: ${document.getElementById('disc-image').value}\n`;
@@ -858,7 +871,7 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ 
-                        message: `Update ${type}: ${fileName}`, 
+                        message: `Update ${type} data`, 
                         content: btoa(unescape(encodeURIComponent(yaml))), 
                         sha: sha || undefined 
                     })

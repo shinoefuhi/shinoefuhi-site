@@ -8,18 +8,151 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;600&family=Montserrat:wght@300;600&display=swap">
     <script src="https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js"></script>
     <style>
-        /* index.htmlのスタイルを継承 */
-        :root { --bg:#f8fafd; --text:#2c3e50; --sub:#7f8c8d; --accent:#fdfd96; }
-        body { margin:0; background:var(--bg); color:var(--text); font-family:'Noto Serif JP',serif; line-height:1.8; }
-        nav { position:sticky; top:0; backdrop-filter:blur(12px); background:rgba(255,255,255,.9); padding:18px; display:flex; justify-content:center; gap:40px; font-family:'Montserrat',sans-serif; font-size:.85rem; z-index:100; }
-        section { padding:60px 20px; max-width:1000px; margin:auto; }
-        h2 { text-align:center; font-family:'Montserrat',sans-serif; font-weight:300; letter-spacing:.3rem; margin-bottom:60px; }
-        .live-item { background:#fff; padding:24px; margin-bottom:20px; border-left:4px solid var(--sub); box-shadow:0 8px 20px rgba(0,0,0,.06); display:flex; flex-wrap:wrap; gap:20px; }
-        .live-date { min-width:140px; font-family:'Montserrat',sans-serif; font-weight:600; }
-        .btn { border:1px solid var(--text); padding:8px 20px; border-radius:30px; font-size:.8rem; transition:.3s; display:inline-block; margin-top:20px; }
-        .btn:hover { background:var(--text); color:#fff; }
-        footer { text-align:center; padding:60px; font-size:.75rem; color:var(--sub); }
-        a { text-decoration:none; color:inherit; }
+        :root { 
+            --bg:#f8fafd; 
+            --text:#2c3e50; 
+            --sub:#7f8c8d; 
+            --accent:#fdfd96;
+            --shadow: rgba(0, 0, 0, 0.08);
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body { 
+            margin:0; 
+            background:var(--bg); 
+            color:var(--text); 
+            font-family:'Noto Serif JP',serif; 
+            line-height:1.8; 
+        }
+        
+        nav { 
+            position:sticky; 
+            top:0; 
+            backdrop-filter:blur(20px); 
+            -webkit-backdrop-filter:blur(20px);
+            background:rgba(255,255,255,.85); 
+            padding:20px; 
+            display:flex; 
+            justify-content:center; 
+            gap:40px; 
+            font-family:'Montserrat',sans-serif; 
+            font-size:.85rem; 
+            z-index:100;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.03);
+        }
+        
+        nav a {
+            transition: all 0.3s ease;
+            position: relative;
+            letter-spacing: 0.15em;
+        }
+        
+        nav a:hover {
+            color: #4b7bec;
+        }
+        
+        section { 
+            padding:80px 20px; 
+            max-width:1000px; 
+            margin:auto; 
+        }
+        
+        h2 { 
+            text-align:center; 
+            font-family:'Montserrat',sans-serif; 
+            font-weight:300; 
+            letter-spacing:.3rem; 
+            margin-bottom:60px;
+            position: relative;
+            padding-bottom: 20px;
+        }
+        
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--accent), transparent);
+        }
+        
+        .live-item { 
+            background:#fff; 
+            padding:24px; 
+            margin-bottom:20px; 
+            border-left:4px solid var(--sub); 
+            box-shadow:0 8px 24px var(--shadow); 
+            display:flex; 
+            flex-wrap:wrap; 
+            gap:20px;
+            border-radius: 4px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .live-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 36px rgba(0,0,0,0.12);
+        }
+        
+        .live-date { 
+            min-width:140px; 
+            font-family:'Montserrat',sans-serif; 
+            font-weight:600;
+            color: var(--text);
+        }
+        
+        .btn { 
+            border:1px solid var(--text); 
+            padding:10px 24px; 
+            border-radius:30px; 
+            font-size:.8rem; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            display:inline-block; 
+            margin-top:20px; 
+        }
+        
+        .btn:hover { 
+            background:var(--text); 
+            color:#fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        
+        footer { 
+            text-align:center; 
+            padding:60px; 
+            font-size:.75rem; 
+            color:var(--sub);
+            background: rgba(0,0,0,0.02);
+        }
+        
+        a { 
+            text-decoration:none; 
+            color:inherit; 
+        }
+        
+        @media(max-width:768px){
+            .live-item { 
+                flex-direction: column; 
+            }
+            
+            .live-item > div {
+                flex-direction: column;
+                gap: 10px !important;
+            }
+            
+            .live-item img {
+                width: 100% !important;
+                max-width: 200px;
+                margin: 0 auto;
+                display: block;
+            }
+        }
     </style>
 </head>
 <body>
@@ -74,16 +207,33 @@ async function loadArchive() {
         past.forEach(l => {
             const el = document.createElement("div");
             el.className = "live-item";
+            
+            const d = new Date(l.date);
+            const displayDate = isNaN(d) ? String(l.date) : `${d.getFullYear()}.${('0' + (d.getMonth() + 1)).slice(-2)}.${('0' + d.getDate()).slice(-2)}`;
+            
             el.innerHTML = `
-               <div class="live-date">
-    ${(() => {
-        const d = new Date(l.date);
-        return isNaN(d) ? String(l.date) : `${d.getFullYear()}.${('0' + (d.getMonth() + 1)).slice(-2)}.${('0' + d.getDate()).slice(-2)}`;
-    })()}
-</div>
-                <div class="live-info">
-                    <strong>${l.title}</strong><br>
-                    <span style="color:#777">@ ${l.place}</span>
+                <div style="display:flex; flex-wrap:wrap; gap:20px; width:100%;">
+                    ${l.flyer ? `
+                        <div style="flex: 0 0 100px;">
+                            <img src="${l.flyer}" style="width:100%; border-radius:4px; box-shadow:0 2px 8px rgba(0,0,0,0.1); cursor:pointer;" onclick="window.open('${l.flyer}')">
+                        </div>
+                    ` : ''}
+                    
+                    <div style="flex: 1; min-width: 200px;">
+                        <div class="live-date">${displayDate}</div>
+                        <div class="live-info">
+                            <strong>${l.title || ""}</strong><br>
+                            <span style="color:#777">@ ${l.place || ""}</span><br>
+                            <small style="color:#888; font-size:0.85rem;">
+                                ${l.open_time ? 'OPEN ' + l.open_time : ''} ${l.start_time ? '/ START ' + l.start_time : ''}
+                                ${l.price ? '<br>TICKET: ' + l.price : ''}
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        ${l.twitterUrl ? `<a href="${l.twitterUrl}" target="_blank" class="btn" style="background:#000;color:#fff;padding:8px 12px;border-radius:4px;"><i class="fa-brands fa-x-twitter"></i></a>` : ""}
+                    </div>
                 </div>
             `;
             list.appendChild(el);
